@@ -35,23 +35,27 @@ const CreateAccountScreen = ({ navigation }) => {
           placeholder="username"
           value={username}
           setValue={setUsername}
+          formIcon="person"
         />
         <CustomInput
           placeholder="email address"
           value={email}
           setValue={setEmail}
+          formIcon="email"
         />
         <CustomInput
           placeholder="password"
           value={password}
           setValue={setPassword}
           secureTextEntry={true}
+          formIcon="lock-outline"
         />
         <CustomInput
           placeholder="confirm password"
           value={passwordConfirm}
           setValue={setPasswordConfirm}
           secureTextEntry={true}
+          formIcon="lock"
         />
         <CustomButton text="Create Account" onPress={onCreateAccountPress} />
         <Text style={styles.text}>

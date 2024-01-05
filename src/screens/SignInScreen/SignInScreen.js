@@ -41,11 +41,13 @@ const SignInScreen = ({ navigation }) => {
           placeholder="username"
           value={username}
           setValue={setUsername}
+          formIcon="person"
         />
         <CustomInput
           placeholder="password"
           value={password}
           setValue={setPassword}
+          formIcon="lock"
           secureTextEntry={true}
         />
         <CustomButton text="Sign In" onPress={onSignInPress} />
