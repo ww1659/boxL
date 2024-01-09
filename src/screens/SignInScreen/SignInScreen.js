@@ -18,6 +18,7 @@ const SignInScreen = ({ navigation }) => {
 
   const onSignInPress = () => {
     console.log("Sign In");
+    navigation.navigate("Home");
   };
 
   const onForgotPasswordPress = () => {
@@ -72,7 +73,7 @@ const SignInScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   root: {
     alignItems: "center",
-    paddingTop: 80,
+    paddingTop: 50,
     paddingHorizontal: 20,
   },
   logo: {
@@ -80,6 +81,7 @@ const styles = StyleSheet.create({
     maxWidth: 500,
     maxHeight: 150,
     marginBottom: 20,
+    marginTop: 20,
   },
 });
 
