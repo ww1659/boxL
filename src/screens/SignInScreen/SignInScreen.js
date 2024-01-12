@@ -18,7 +18,7 @@ const SignInScreen = ({ navigation }) => {
 
   const onSignInPress = () => {
     console.log("Sign In");
-    navigation.navigate("Home");
+    navigation.navigate("BottomTabs");
   };
 
   const onForgotPasswordPress = () => {
@@ -27,7 +27,7 @@ const SignInScreen = ({ navigation }) => {
 
   const onCreateAccountPress = () => {
     console.log("Create Account Page");
-    navigation.navigate("Account");
+    navigation.navigate("CreateAccountScreen");
   };
 
   return (

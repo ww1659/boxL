@@ -24,7 +24,7 @@ const CreateAccountScreen = ({ navigation }) => {
 
   const onSignInPress = () => {
     console.log("Back to Sign in Page");
-    navigation.navigate("SignIn");
+    navigation.navigate("SignInScreen");
   };
 
   return (

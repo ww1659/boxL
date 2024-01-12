@@ -1,11 +1,11 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import React from "react";
-import Logo from "../../../assets/images/logo.png";
+import LogoInverse from "../../../assets/images/logoInverse.png";
 
 const HomeScreen = () => {
   return (
     <View style={styles.root}>
-      <Image source={Logo} style={[styles.logo]} resizeMode="contain" />
+      <Image source={LogoInverse} style={[styles.logo]} resizeMode="contain" />
       <Text style={styles.header}>Welcome, Billy</Text>
     </View>
   );
@@ -15,13 +15,13 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   root: {
-    paddingTop: 50,
+    paddingTop: 40,
     paddingHorizontal: 20,
   },
   logo: {
     width: "100%",
     maxWidth: 500,
-    maxHeight: 40,
+    maxHeight: 80,
   },
   header: {
     fontSize: 30,
