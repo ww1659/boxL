@@ -1,13 +1,16 @@
 import { View, Text, StyleSheet, Image } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
 import LogoInverse from "../../../assets/images/logoInverse.png";
 
 const HomeScreen = () => {
   return (
-    <View style={styles.root}>
-      <Image source={LogoInverse} style={[styles.logo]} resizeMode="contain" />
-      <Text style={styles.header}>Welcome, Billy</Text>
-    </View>
+    <SafeAreaView>
+      <View style={styles.root}>
+        {/* <Image source={LogoInverse} style={[styles.logo]} resizeMode="contain" /> */}
+        <Text style={styles.header}>Welcome, Billy</Text>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -15,7 +18,6 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   root: {
-    paddingTop: 40,
     paddingHorizontal: 20,
   },
   logo: {

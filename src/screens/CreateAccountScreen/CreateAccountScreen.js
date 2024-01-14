@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from "react-native";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import SocialSignInButtons from "../../components/SocialSignInButtons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const CreateAccountScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -29,52 +30,54 @@ const CreateAccountScreen = ({ navigation }) => {
 
   return (
     <ScrollView>
-      <View style={styles.root}>
-        <Text style={styles.title}>Create an Account</Text>
-        <CustomInput
-          placeholder="username"
-          value={username}
-          setValue={setUsername}
-          formIcon="person"
-        />
-        <CustomInput
-          placeholder="email address"
-          value={email}
-          setValue={setEmail}
-          formIcon="email"
-        />
-        <CustomInput
-          placeholder="password"
-          value={password}
-          setValue={setPassword}
-          secureTextEntry={true}
-          formIcon="lock-outline"
-        />
-        <CustomInput
-          placeholder="confirm password"
-          value={passwordConfirm}
-          setValue={setPasswordConfirm}
-          secureTextEntry={true}
-          formIcon="lock"
-        />
-        <CustomButton text="Create Account" onPress={onCreateAccountPress} />
-        <Text style={styles.text}>
-          By registering, you confirm that you accept our{" "}
-          <Text style={styles.link} onPress={onTermsOfUsePress}>
-            terms of use
-          </Text>{" "}
-          and{" "}
-          <Text style={styles.link} onPress={onPrivacyPolicyPress}>
-            Privacy Policy.
+      <SafeAreaView>
+        <View style={styles.root}>
+          <Text style={styles.title}>Create an Account</Text>
+          <CustomInput
+            placeholder="username"
+            value={username}
+            setValue={setUsername}
+            formIcon="person"
+          />
+          <CustomInput
+            placeholder="email address"
+            value={email}
+            setValue={setEmail}
+            formIcon="email"
+          />
+          <CustomInput
+            placeholder="password"
+            value={password}
+            setValue={setPassword}
+            secureTextEntry={true}
+            formIcon="lock-outline"
+          />
+          <CustomInput
+            placeholder="confirm password"
+            value={passwordConfirm}
+            setValue={setPasswordConfirm}
+            secureTextEntry={true}
+            formIcon="lock"
+          />
+          <CustomButton text="Create Account" onPress={onCreateAccountPress} />
+          <Text style={styles.text}>
+            By registering, you confirm that you accept our{" "}
+            <Text style={styles.link} onPress={onTermsOfUsePress}>
+              terms of use
+            </Text>{" "}
+            and{" "}
+            <Text style={styles.link} onPress={onPrivacyPolicyPress}>
+              Privacy Policy.
+            </Text>
           </Text>
-        </Text>
 
-        <CustomButton
-          text="Already have an account? Sign in."
-          onPress={onSignInPress}
-          type="TERTIARY"
-        />
-      </View>
+          <CustomButton
+            text="Already have an account? Sign in."
+            onPress={onSignInPress}
+            type="TERTIARY"
+          />
+        </View>
+      </SafeAreaView>
     </ScrollView>
   );
 };
@@ -82,7 +85,7 @@ const CreateAccountScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   root: {
     alignItems: "center",
-    paddingTop: 80,
+    paddingTop: 30,
     paddingHorizontal: 20,
   },
   title: {

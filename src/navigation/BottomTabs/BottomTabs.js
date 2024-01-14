@@ -28,8 +28,9 @@ const BottomTabs = () => {
             <MaterialCommunityIcons name={iconName} size={24} color="black" />
           );
         },
-        tabBarActiveTintColor: "tomato",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: "#D90429",
+        tabBarInactiveTintColor: "#2B2D42",
+        headerShown: false,
       })}
     >
       <Tab.Screen name="HomeScreen" component={HomeScreen} />

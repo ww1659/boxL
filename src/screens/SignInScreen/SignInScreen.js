@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Image,
@@ -32,40 +33,42 @@ const SignInScreen = ({ navigation }) => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={styles.root}>
-        <Image
-          source={Logo}
-          style={[styles.logo, { height: height * 0.3 }]}
-          resizeMode="contain"
-        />
-        <CustomInput
-          placeholder="username"
-          value={username}
-          setValue={setUsername}
-          formIcon="person"
-        />
-        <CustomInput
-          placeholder="password"
-          value={password}
-          setValue={setPassword}
-          formIcon="lock"
-          secureTextEntry={true}
-        />
-        <CustomButton text="Sign In" onPress={onSignInPress} />
-        <CustomButton
-          text="Forgot Password?"
-          onPress={onForgotPasswordPress}
-          type="TERTIARY"
-        />
+      <SafeAreaView>
+        <View style={styles.root}>
+          <Image
+            source={Logo}
+            style={[styles.logo, { height: height * 0.3 }]}
+            resizeMode="contain"
+          />
+          <CustomInput
+            placeholder="username"
+            value={username}
+            setValue={setUsername}
+            formIcon="person"
+          />
+          <CustomInput
+            placeholder="password"
+            value={password}
+            setValue={setPassword}
+            formIcon="lock"
+            secureTextEntry={true}
+          />
+          <CustomButton text="Sign In" onPress={onSignInPress} />
+          <CustomButton
+            text="Forgot Password?"
+            onPress={onForgotPasswordPress}
+            type="TERTIARY"
+          />
 
-        <SocialSignInButtons />
+          <SocialSignInButtons />
 
-        <CustomButton
-          text="Don't have an account? Create one."
-          onPress={onCreateAccountPress}
-          type="TERTIARY"
-        />
-      </View>
+          <CustomButton
+            text="Don't have an account? Create one."
+            onPress={onCreateAccountPress}
+            type="TERTIARY"
+          />
+        </View>
+      </SafeAreaView>
     </ScrollView>
   );
 };
@@ -73,7 +76,6 @@ const SignInScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   root: {
     alignItems: "center",
-    paddingTop: 50,
     paddingHorizontal: 20,
   },
   logo: {
@@ -81,7 +83,7 @@ const styles = StyleSheet.create({
     maxWidth: 500,
     maxHeight: 150,
     marginBottom: 20,
-    marginTop: 20,
+    marginTop: 50,
   },
 });
 
