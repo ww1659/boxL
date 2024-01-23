@@ -9,13 +9,22 @@ const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="SignInScreen" component={SignInScreen}></Stack.Screen>
+    <Stack.Navigator>
+      <Stack.Screen
+        name="SignInScreen"
+        component={SignInScreen}
+        options={{ headerShown: false }}
+      ></Stack.Screen>
       <Stack.Screen
         name="CreateAccountScreen"
         component={CreateAccountScreen}
+        options={{ headerShown: false }}
       ></Stack.Screen>
-      <Stack.Screen name="BottomTabs" component={BottomTabs}></Stack.Screen>
+      <Stack.Screen
+        name="BottomTabs"
+        component={BottomTabs}
+        options={{ headerShown: false }}
+      ></Stack.Screen>
     </Stack.Navigator>
   );
 };

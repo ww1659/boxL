@@ -1,9 +1,10 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Header from "../../components/Header";
 
 //screens
-import HomeScreen from "../../screens/HomeScreen";
+import HomeNavigator from "../HomeNavigator";
 import SettingsScreen from "../../screens/SettingsScreen/SettingsScreen";
 import ProfileScreen from "../../screens/ProfileScreen";
 
@@ -16,6 +17,8 @@ const BottomTabs = () => {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           let rn = route.name;
+          color = "#2B2D42";
+          size = 24;
 
           if (rn === "HomeScreen") {
             iconName = focused ? "home-variant" : "home-variant-outline";
@@ -24,16 +27,17 @@ const BottomTabs = () => {
           } else if (rn === "SettingsScreen") {
             iconName = focused ? "cog" : "cog-outline";
           }
+
           return (
-            <MaterialCommunityIcons name={iconName} size={24} color="black" />
+            <MaterialCommunityIcons name={iconName} size={size} color={color} />
           );
         },
-        tabBarActiveTintColor: "#D90429",
-        tabBarInactiveTintColor: "#2B2D42",
+
+        tabBarShowLabel: false,
         headerShown: false,
       })}
     >
-      <Tab.Screen name="HomeScreen" component={HomeScreen} />
+      <Tab.Screen name="HomeScreen" component={HomeNavigator} />
       <Tab.Screen name="ProfileScreen" component={ProfileScreen} />
       <Tab.Screen name="SettingsScreen" component={SettingsScreen} />
     </Tab.Navigator>

@@ -1,9 +1,17 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
+import { useEffect } from "react";
 import LogoInverse from "../../../assets/images/logoInverse.png";
+import { fetchLeagues } from "../../utils/api";
 
 const HomeScreen = () => {
+  useEffect(() => {
+    fetchLeagues().then((leagues) => {
+      console.log(leagues);
+    });
+  });
+
   return (
     <SafeAreaView>
       <View style={styles.root}>
