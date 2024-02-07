@@ -2,9 +2,8 @@ import { View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar, Text } from "react-native-paper";
 import React from "react";
-import Logo from "../../../assets/images/logo.png";
 
-const ProfileScreen = () => {
+const ResultsScreen = () => {
   return (
     <SafeAreaView>
       <View style={styles.root}>
@@ -26,4 +25,4 @@ const styles = StyleSheet.create({
   header: { marginVertical: 10, color: "#2B2D42" },
 });
 
-export default ProfileScreen;
+export default ResultsScreen;

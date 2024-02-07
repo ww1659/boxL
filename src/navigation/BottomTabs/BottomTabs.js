@@ -5,8 +5,8 @@ import Header from "../../components/Header";
 
 //screens
 import HomeNavigator from "../HomeNavigator";
-import SettingsScreen from "../../screens/SettingsScreen/SettingsScreen";
-import ProfileScreen from "../../screens/ProfileScreen";
+import StatsScreen from "../../screens/StatsScreen/StatsScreen";
+import ResultsScreen from "../../screens/ResultsScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -20,12 +20,12 @@ const BottomTabs = () => {
           color = "#2B2D42";
           size = 24;
 
-          if (rn === "HomeScreen") {
-            iconName = focused ? "home-variant" : "home-variant-outline";
-          } else if (rn === "ProfileScreen") {
+          if (rn === "LeaguesScreen") {
+            iconName = focused ? "trophy" : "trophy-outline";
+          } else if (rn === "ResultsScreen") {
+            iconName = focused ? "view-list" : "view-list-outline";
+          } else if (rn === "StatsScreen") {
             iconName = focused ? "account-circle" : "account-circle-outline";
-          } else if (rn === "SettingsScreen") {
-            iconName = focused ? "cog" : "cog-outline";
           }
 
           return (
@@ -37,9 +37,9 @@ const BottomTabs = () => {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="HomeScreen" component={HomeNavigator} />
-      <Tab.Screen name="ProfileScreen" component={ProfileScreen} />
-      <Tab.Screen name="SettingsScreen" component={SettingsScreen} />
+      <Tab.Screen name="LeaguesScreen" component={HomeNavigator} />
+      <Tab.Screen name="ResultsScreen" component={ResultsScreen} />
+      <Tab.Screen name="StatsScreen" component={StatsScreen} />
     </Tab.Navigator>
   );
 };

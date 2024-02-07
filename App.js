@@ -2,14 +2,17 @@ import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { DefaultTheme, PaperProvider } from "react-native-paper";
 import StackNavigator from "./src/navigation/StackNavigator";
+import { AuthProvider } from "./src/contexts/AuthContext";
 
 export default function App() {
   return (
-    <PaperProvider theme={customTheme}>
-      <NavigationContainer style={styles.container}>
-        <StackNavigator />
-      </NavigationContainer>
-    </PaperProvider>
+    <AuthProvider>
+      <PaperProvider theme={customTheme}>
+        <NavigationContainer style={styles.container}>
+          <StackNavigator />
+        </NavigationContainer>
+      </PaperProvider>
+    </AuthProvider>
   );
 }
 

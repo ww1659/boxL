@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Header from "../../components/Header";
 
 //screens
-import HomeScreen from "../../screens/HomeScreen";
+import LeaguesScreen from "../../screens/LeaguesScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -11,7 +11,7 @@ const StackNavigator = () => {
     <Stack.Navigator>
       <Stack.Screen
         name="Home"
-        component={HomeScreen}
+        component={LeaguesScreen}
         options={{
           headerTitleAlign: "center",
           headerTitle: () => <Header />,

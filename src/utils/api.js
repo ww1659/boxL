@@ -9,3 +9,9 @@ export const fetchLeagues = () => {
     return res.data.leagues;
   });
 };
+
+export const loginUser = (userInput) => {
+  return myApi.post("/users/login", userInput).then((res) => {
+    return res.data;
+  });
+};

@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import LogoInverse from "../../../assets/images/logoInverse.png";
 import { fetchLeagues } from "../../utils/api";
 
-const HomeScreen = () => {
+const LeaguesScreen = () => {
   useEffect(() => {
     fetchLeagues().then((leagues) => {
       console.log(leagues);
@@ -22,7 +22,7 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen;
+export default LeaguesScreen;
 
 const styles = StyleSheet.create({
   root: {

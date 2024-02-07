@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
@@ -13,13 +14,25 @@ import CustomButton from "../../components/CustomButton";
 import SocialSignInButtons from "../../components/SocialSignInButtons";
 
 const SignInScreen = ({ navigation }) => {
+  const { login, user } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
   const { height } = useWindowDimensions();
 
-  const onSignInPress = () => {
+  const onSignInPress = async (event) => {
+    event.preventDefault();
     console.log("Sign In");
-    navigation.navigate("BottomTabs");
+    setLoginLoading(true);
+    try {
+      const response = await login({ username, password });
+      console.log(response);
+      if (response.status === true) {
+        navigation.navigate("BottomTabs");
+      }
+    } catch (error) {
+      console.log(error.response);
+    }
   };
 
   const onForgotPasswordPress = () => {
