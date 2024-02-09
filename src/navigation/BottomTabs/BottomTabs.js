@@ -4,9 +4,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Header from "../../components/Header";
 
 //screens
-import HomeNavigator from "../HomeNavigator";
 import StatsScreen from "../../screens/StatsScreen/StatsScreen";
 import ResultsScreen from "../../screens/ResultsScreen";
+import LeaguesNavigator from "../LeaguesNavigator/LeaguesNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -37,7 +37,7 @@ const BottomTabs = () => {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="LeaguesScreen" component={HomeNavigator} />
+      <Tab.Screen name="LeaguesScreen" component={LeaguesNavigator} />
       <Tab.Screen name="ResultsScreen" component={ResultsScreen} />
       <Tab.Screen name="StatsScreen" component={StatsScreen} />
     </Tab.Navigator>

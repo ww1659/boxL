@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
+  Text,
   View,
   Image,
   StyleSheet,
@@ -14,23 +15,34 @@ import CustomButton from "../../components/CustomButton";
 import SocialSignInButtons from "../../components/SocialSignInButtons";
 
 const SignInScreen = ({ navigation }) => {
-  const { login, user } = useAuth();
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [noUsernameError, setNoUsernameError] = useState(false);
+  const [noPasswordError, setNoPasswordError] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const { height } = useWindowDimensions();
 
   const onSignInPress = async (event) => {
     event.preventDefault();
-    console.log("Sign In");
+
+    if (!username) {
+      setNoUsernameError(true);
+    }
+
+    if (!password) {
+      setNoPasswordError(true);
+    }
+
     setLoginLoading(true);
     try {
       const response = await login({ username, password });
-      console.log(response);
       if (response.status === true) {
+        setLoginLoading(false);
         navigation.navigate("BottomTabs");
       }
     } catch (error) {
+      setLoginLoading(false);
       console.log(error.response);
     }
   };
@@ -43,6 +55,16 @@ const SignInScreen = ({ navigation }) => {
     console.log("Create Account Page");
     navigation.navigate("CreateAccountScreen");
   };
+
+  if (loginLoading)
+    return (
+      <SafeAreaView>
+        <Text>
+          Loading. Sorry this is a bit shit atm but I promise it's loading. You
+          might just have to wait a bit.
+        </Text>
+      </SafeAreaView>
+    );
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -58,6 +80,7 @@ const SignInScreen = ({ navigation }) => {
             value={username}
             setValue={setUsername}
             formIcon="person"
+            error={noUsernameError}
           />
           <CustomInput
             placeholder="password"
@@ -65,8 +88,13 @@ const SignInScreen = ({ navigation }) => {
             setValue={setPassword}
             formIcon="lock"
             secureTextEntry={true}
+            error={noPasswordError}
           />
-          <CustomButton text="Sign In" onPress={onSignInPress} />
+          <CustomButton
+            text="Sign In"
+            onPress={onSignInPress}
+            disabled={false}
+          />
           <CustomButton
             text="Forgot Password?"
             onPress={onForgotPasswordPress}

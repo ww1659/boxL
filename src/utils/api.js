@@ -4,14 +4,38 @@ const myApi = axios.create({
   baseURL: "https://boxl-api.onrender.com/api",
 });
 
-export const fetchLeagues = () => {
-  return myApi.get("/leagues").then((res) => {
-    return res.data.leagues;
+export const fetchLeaguesByUserId = (userId) => {
+  return myApi.get(`/leagues/users/${userId}`).then((res) => {
+    return res.data.leaguesByUserId;
   });
 };
 
-export const loginUser = (userInput) => {
-  return myApi.post("/users/login", userInput).then((res) => {
+export const fetchLeagueByLeagueId = (leagueId) => {
+  return myApi.get(`/leagues/${leagueId}`).then((res) => {
+    return res.data.league;
+  });
+};
+
+export const fetchClubsById = (clubId) => {
+  return myApi.get(`/clubs/${clubId}`).then((res) => {
+    return res.data.club;
+  });
+};
+
+export const loginUser = (userId) => {
+  return myApi.post("/users/login", userId).then((res) => {
     return res.data;
+  });
+};
+
+export const fetchUsersByLeagueId = (leagueId) => {
+  return myApi.get(`/users/leagues/${leagueId}`).then((res) => {
+    return res.data.users;
+  });
+};
+
+export const fetchResultsByLeagueId = (leagueId) => {
+  return myApi.get(`/results/leagues/${leagueId}`).then((res) => {
+    return res.data.resultsByLeagueId;
   });
 };

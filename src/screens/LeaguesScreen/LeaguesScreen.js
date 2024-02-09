@@ -1,22 +1,55 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, FlatList } from "react-native";
+import { useAuth } from "../../contexts/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React from "react";
 import { useEffect } from "react";
+import { fetchLeaguesByUserId } from "../../utils/api";
+import { startCase } from "lodash";
 import LogoInverse from "../../../assets/images/logoInverse.png";
-import { fetchLeagues } from "../../utils/api";
+import LeagueCard from "../../components/LeagueCard/LeagueCard";
 
-const LeaguesScreen = () => {
+const LeaguesScreen = ({ navigation }) => {
+  const [leagues, setLeagues] = useState([]);
+  const { user } = useAuth();
+
   useEffect(() => {
-    fetchLeagues().then((leagues) => {
-      console.log(leagues);
-    });
-  });
+    fetchLeaguesByUserId(user.userId)
+      .then((leagues) => {
+        setLeagues(leagues);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  const firstName = startCase(user.name.split(" ")[0]);
+  console.log(leagues);
+
+  const navigateToIndividualLeague = (leagueId) => {
+    navigation.navigate("IndividualLeague", { leagueId });
+  };
 
   return (
     <SafeAreaView>
       <View style={styles.root}>
         {/* <Image source={LogoInverse} style={[styles.logo]} resizeMode="contain" /> */}
-        <Text style={styles.header}>Welcome, Billy</Text>
+        <Text style={styles.header}>Welcome, {firstName}</Text>
+        <Text style={[styles.header, styles.leagueHeader]}>Your Leagues</Text>
+        <FlatList
+          data={leagues}
+          renderItem={({ item }) => (
+            <LeagueCard
+              leagueId={item.league_id}
+              leagueName={item.name}
+              clubId={item.club_id}
+              startDate={item.start_date}
+              endDate={item.end_date}
+              format={item.format}
+              onPress={() => navigateToIndividualLeague(item.league_id)}
+            />
+          )}
+          keyExtractor={(item) => item.league_id.toString()}
+        ></FlatList>
       </View>
     </SafeAreaView>
   );
@@ -35,7 +68,12 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 30,
+    paddingVertical: 10,
     textAlign: "left",
     color: "#2B2D42",
+  },
+  leagueHeader: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

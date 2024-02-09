@@ -5,6 +5,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState({
+    userId: "",
     username: "",
     name: "",
     email: "",
@@ -15,6 +16,17 @@ export const AuthProvider = ({ children }) => {
   const login = async (userInput) => {
     try {
       const response = await loginUser(userInput);
+      if (response.status === true) {
+        const user = response.user;
+        setUser({
+          userId: user.user_id,
+          username: user.username,
+          name: user.name,
+          email: user.email,
+          avatar_url: user.avatar_url,
+          club: user.club,
+        });
+      }
       return response;
     } catch (err) {
       throw err;
@@ -23,6 +35,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser({
+      userId: "",
       username: "",
       name: "",
       email: "",
