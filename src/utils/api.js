@@ -39,3 +39,9 @@ export const fetchResultsByLeagueId = (leagueId) => {
     return res.data.resultsByLeagueId;
   });
 };
+
+export const fetchStandingsByLeagueId = (leagueId) => {
+  return myApi.get(`/leagues/${leagueId}/standings`).then((res) => {
+    return res.data.standings;
+  });
+};
