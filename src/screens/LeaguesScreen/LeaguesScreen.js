@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import { useAuth } from "../../contexts/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect } from "react";
-import { fetchLeaguesByUserId } from "../../utils/api";
 import { startCase } from "lodash";
+import { fetchLeaguesByUserId } from "../../utils/api";
+import { useAuth } from "../../contexts/AuthContext";
 import LogoInverse from "../../../assets/images/logoInverse.png";
 import LeagueCard from "../../components/LeagueCard/LeagueCard";
 
@@ -26,7 +25,7 @@ const LeaguesScreen = ({ navigation }) => {
   console.log(leagues);
 
   const navigateToIndividualLeague = (leagueId) => {
-    navigation.navigate("IndividualLeague", { leagueId });
+    navigation.navigate("IndividualNavigator", { leagueId });
   };
 
   return (

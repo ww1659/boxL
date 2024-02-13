@@ -1,7 +1,7 @@
 import React from "react";
+import { View, StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { View, StyleSheet } from "react-native";
 
 const LeagueButton = ({ text, icon, onPress }) => (
   <View style={styles.button}>
@@ -21,7 +21,7 @@ const LeagueButton = ({ text, icon, onPress }) => (
 
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: 20,
+    paddingVertical: 0,
   },
 });
 

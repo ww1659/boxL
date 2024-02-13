@@ -1,36 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { View, FlatList, ScrollView, StyleSheet } from "react-native";
-import { fetchResultsByLeagueId } from "../../utils/api";
-import {
-  ActivityIndicator,
-  Avatar,
-  Button,
-  Card,
-  Text,
-} from "react-native-paper";
+import { ActivityIndicator, Text } from "react-native-paper";
 import { startCase } from "lodash";
+import { formatDateShort } from "../../utils/formatDate";
 
 const getFirstName = (name) => {
   return startCase(name.split(" ")[0]);
 };
 
 const LeagueResultsScreen = ({ route }) => {
-  const { leagueId } = route.params;
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchResultsByLeagueId(leagueId)
-      .then((results) => {
-        setResults(results);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+  const { results, loading } = route.params;
 
   console.log(results);
 
@@ -45,6 +24,9 @@ const LeagueResultsScreen = ({ route }) => {
             renderItem={({ item, index }) => (
               <View style={styles.matchCard}>
                 <View style={styles.matchInfo}>
+                  <Text style={styles.text}>
+                    {formatDateShort(item.match_date)}
+                  </Text>
                   <Text style={styles.text}>{item.group_name}</Text>
                   <Text style={styles.text}>
                     {getFirstName(item.winner_name)}

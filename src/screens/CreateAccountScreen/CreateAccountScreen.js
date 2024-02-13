@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import SocialSignInButtons from "../../components/SocialSignInButtons";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const CreateAccountScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");

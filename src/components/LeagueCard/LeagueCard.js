@@ -8,15 +8,10 @@ import {
 } from "react-native-paper";
 import { startCase } from "lodash";
 import { fetchClubsById } from "../../utils/api";
-import { TouchableOpacity } from "react-native-web";
+import { TouchableOpacity } from "react-native";
+import { formatDateLong } from "../../utils/formatDate";
 
 const LeftContent = (props) => <Avatar.Icon {...props} icon="trophy" />;
-
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const options = { day: "numeric", month: "long", year: "numeric" };
-  return date.toLocaleDateString("en-GB", options);
-};
 
 const changeFormat = (format) => {
   return startCase(format.split("_").join(" "));
@@ -62,7 +57,9 @@ const LeagueCard = ({
               left={LeftContent}
             />
             <Card.Content>
-              <Text variant="bodyMedium">End Date: {formatDate(endDate)}</Text>
+              <Text variant="bodyMedium">
+                End Date: {formatDateLong(endDate)}
+              </Text>
               <Text variant="bodyMedium">Format: {changeFormat(format)}</Text>
             </Card.Content>
           </>
