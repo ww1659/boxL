@@ -9,6 +9,7 @@ import {
   ScrollView,
   useWindowDimensions,
 } from "react-native";
+import { ProgressBar } from "react-native-paper";
 import Logo from "../../../assets/images/logo.png";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
@@ -58,11 +59,11 @@ const SignInScreen = ({ navigation }) => {
 
   if (loginLoading)
     return (
-      <SafeAreaView>
-        <Text>
-          Loading. Sorry this is a bit shit atm but I promise it's loading. You
-          might just have to wait a bit.
-        </Text>
+      <SafeAreaView style={styles.loading}>
+        <View>
+          <Text style={styles.loadingText}>Signing you in...</Text>
+          <ProgressBar progress={1} />
+        </View>
       </SafeAreaView>
     );
 
@@ -125,6 +126,16 @@ const styles = StyleSheet.create({
     maxHeight: 150,
     marginBottom: 20,
     marginTop: 50,
+  },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginVertical: 5,
+    fontSize: 24,
+    color: "#2B2D42",
   },
 });
 

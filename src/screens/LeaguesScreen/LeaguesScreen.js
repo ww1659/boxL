@@ -22,7 +22,6 @@ const LeaguesScreen = ({ navigation }) => {
   }, []);
 
   const firstName = startCase(user.name.split(" ")[0]);
-  console.log(leagues);
 
   const navigateToIndividualLeague = (leagueId) => {
     navigation.navigate("IndividualNavigator", { leagueId });

@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import {
+  fetchClubsById,
   fetchLeagueByLeagueId,
   fetchResultsByLeagueId,
   fetchStandingsByLeagueId,
@@ -13,9 +14,8 @@ export const LeagueDataProvider = ({ leagueId, children }) => {
   const [standings, setStandings] = useState([]);
   const [results, setResults] = useState([]);
   const [players, setPlayers] = useState([]);
+  const [club, setClub] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  console.log(leagueId, "CONTEXT");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +30,8 @@ export const LeagueDataProvider = ({ leagueId, children }) => {
         setStandings(standings);
         setResults(results);
         setPlayers(users);
+        const club = await fetchClubsById(league[0].club_id);
+        setClub(club[0]);
         setLoading(false);
       } catch (error) {
         console.error("error fetching league data:", error);
@@ -48,6 +50,7 @@ export const LeagueDataProvider = ({ leagueId, children }) => {
         standings,
         results,
         players,
+        club,
         loading,
         setStandings,
         setResults,
