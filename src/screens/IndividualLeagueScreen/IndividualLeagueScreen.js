@@ -72,21 +72,18 @@ const IndividualLeagueScreen = ({ navigation }) => {
               <View key={groupName} style={styles.groupContainer}>
                 <Text style={styles.groupTitle}>Group {groupName}</Text>
                 <StandingsHeader />
-                <FlatList
-                  data={sortedStandings.filter(
-                    (item) => item.group_name === groupName
-                  )}
-                  renderItem={({ item }) => (
+                {sortedStandings
+                  .filter((item) => item.group_name === groupName)
+                  .map((item) => (
                     <StandingsRow
+                      key={item.standing_id}
                       leagueId={item.league_id}
                       group={item.group_name}
                       player={getFirstName(item.player_name)}
                       matchesPlayed={item.matches_played}
                       wins={item.wins}
                     />
-                  )}
-                  keyExtractor={(item) => item.standing_id.toString()}
-                />
+                  ))}
               </View>
             ))}
           </View>

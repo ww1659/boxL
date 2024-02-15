@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Divider } from "react-native-paper";
 import { startCase } from "lodash";
 
@@ -94,7 +88,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   playerName: {
-    margin: 3,
+    fontSize: 16,
+    margin: 15,
   },
 });
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import { View, TextInput, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const CustomInput = ({
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   error: {
     borderColor: "#D90429",
   },
-  text: { color: "#2B2D42", fontSize: 18 },
+  text: { color: "#2B2D42", fontSize: 18, width: "100%" },
   icon: { marginRight: 10 },
 });
 

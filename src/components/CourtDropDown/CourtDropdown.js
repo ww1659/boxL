@@ -80,7 +80,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   courtNumber: {
-    margin: 3,
+    fontSize: 16,
+    margin: 15,
   },
 });
 

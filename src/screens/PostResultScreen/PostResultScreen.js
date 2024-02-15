@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, ScrollView, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { HelperText, Text } from "react-native-paper";
+import { Text, Checkbox } from "react-native-paper";
 
+//context imports
 import { useLeagueData } from "../../contexts/LeagueDataContext";
 import { useAuth } from "../../contexts/AuthContext";
+
+//utils
 import { findPlayersInSameGroup } from "../../utils/findPlayersInSameGroup";
+import { checkStraightSets } from "../../utils/checkStraightSetsWin";
+
+//components
 import CustomDropdown from "../../components/CustomDropDown/CustomDropdown";
 import CourtDropdown from "../../components/CourtDropDown";
 import ScoreInput from "../../components/ScoreInput/ScoreInput";
 import CustomButton from "../../components/CustomButton";
 import DateInput from "../../components/DateInput/DateInput";
-import { checkStraightSets } from "../../utils/checkStraightSetsWin";
-import { fetchClubsById } from "../../utils/api";
+import CustomInput from "../../components/CustomInput";
 
 const PostResultScreen = () => {
+  //user inputs states
   const [winnerInput, setWinnerInput] = useState("");
   const [loserInput, setLoserInput] = useState("");
   const [firstSetInput, setFirstSetInput] = useState("");
@@ -22,15 +28,18 @@ const PostResultScreen = () => {
   const [thirdSetInput, setThirdSetInput] = useState("");
   const [courtNumberInput, setCourtNumberInput] = useState("");
   const [courtSurfaceInput, setCourtSurfaceInput] = useState("");
+  const [matchNotesInput, setMatchNotesInput] = useState("");
 
+  //error states
   const [firstSetScoreError, setFirstSetScoreError] = useState(false);
   const [secondSetScoreError, setSecondSetScoreError] = useState(false);
   const [thirdSetScoreError, setThirdSetScoreError] = useState(false);
 
-  const [straightSetsWin, setStraightSetsWin] = useState(false);
+  // logic states
   const [thirdSetRequired, setThirdSetRequired] = useState(false);
-
   const [courtDropdownVisible, setCourtDropdownVisible] = useState(false);
+  const [setsEntered, setSetsEntered] = useState(0);
+  const [isChecked, setChecked] = useState(false);
 
   //contexts
   const {
@@ -43,6 +52,27 @@ const PostResultScreen = () => {
     loading,
   } = useLeagueData();
   const { user } = useAuth();
+
+  //exported functions
+  const availablePlayers = findPlayersInSameGroup(standings, players, user);
+
+  // Function to update third set requirement
+  const updateThirdSetRequirement = () => {
+    const isStraightSets = checkStraightSets(firstSetInput, secondSetInput);
+    setThirdSetRequired(!isStraightSets);
+  };
+
+  useEffect(() => {
+    if (
+      firstSetInput &&
+      secondSetInput &&
+      setsEntered >= 2 &&
+      !firstSetScoreError &&
+      !secondSetScoreError
+    ) {
+      updateThirdSetRequirement();
+    }
+  }, [firstSetInput, secondSetInput, setsEntered]);
 
   //toggle visibility functions
   const toggleDropdownVisibility = () => {
@@ -69,25 +99,6 @@ const PostResultScreen = () => {
   };
 
   //LOGS
-  console.log(club);
-  console.log(courtNumberInput);
-  console.log(courtSurfaceInput);
-
-  //exported functions
-  const availablePlayers = findPlayersInSameGroup(standings, players, user);
-
-  // Function to update third set requirement
-  const updateThirdSetRequirement = () => {
-    const isStraightSets = checkStraightSets(firstSetInput, secondSetInput);
-    setStraightSetsWin(isStraightSets);
-    setThirdSetRequired(!isStraightSets);
-  };
-
-  useEffect(() => {
-    if (firstSetInput && secondSetInput) {
-      updateThirdSetRequirement();
-    }
-  }, [firstSetInput, secondSetInput]);
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -98,10 +109,10 @@ const PostResultScreen = () => {
           </Text>
           <View style={styles.row}>
             <Text variant="bodyLarge" style={styles.scoreHeader}>
-              Winner
+              WINNER
             </Text>
             <Text variant="bodyLarge" style={styles.scoreHeader}>
-              Loser
+              LOSER
             </Text>
           </View>
           <View style={[styles.row, styles.dropdown1]}>
@@ -122,10 +133,10 @@ const PostResultScreen = () => {
           </View>
           <View style={styles.row}>
             <Text variant="bodyLarge" style={styles.scoreHeader}>
-              Date
+              Date:
             </Text>
             <Text variant="bodyLarge" style={styles.scoreHeader}>
-              Court
+              Court:
             </Text>
           </View>
           <View style={[styles.row, styles.dropdown2]}>
@@ -133,20 +144,17 @@ const PostResultScreen = () => {
             <CourtDropdown
               numberOfCourts={club.number_of_courts}
               onSelect={handleCourtSelect}
-              label={"Court Number"}
+              label={"Select Court"}
               courtDropdownVisible={courtDropdownVisible}
               toggleDropdownVisibility={toggleDropdownVisibility}
             />
           </View>
           <View style={styles.row}>
             <Text variant="bodyLarge" style={styles.scoreHeader}>
-              First Set
+              First Set Score
             </Text>
             <Text variant="bodyLarge" style={styles.scoreHeader}>
-              Second Set
-            </Text>
-            <Text variant="bodyLarge" style={styles.scoreHeader}>
-              Third Set
+              Second Set Score
             </Text>
           </View>
           <View style={styles.row}>
@@ -156,6 +164,9 @@ const PostResultScreen = () => {
               setValue={setFirstSetInput}
               error={firstSetScoreError}
               setError={setFirstSetScoreError}
+              maxChars={3}
+              setsEntered={setsEntered}
+              setSetsEntered={setSetsEntered}
             />
             <ScoreInput
               placeholder="e.g. 7-6"
@@ -163,19 +174,55 @@ const PostResultScreen = () => {
               setValue={setSecondSetInput}
               error={secondSetScoreError}
               setError={setSecondSetScoreError}
+              maxChars={3}
+              setsEntered={setsEntered}
+              setSetsEntered={setSetsEntered}
             />
-            <ScoreInput
-              placeholder=""
-              value={thirdSetInput}
-              setValue={setThirdSetInput}
-              error={thirdSetScoreError}
-              setError={setThirdSetScoreError}
-              readOnly={!thirdSetRequired}
+          </View>
+          {thirdSetRequired ? (
+            <>
+              <View style={styles.row}>
+                <Text variant="bodyLarge" style={styles.scoreHeader}>
+                  Champs Tiebreak:
+                </Text>
+                <Text variant="bodyLarge" style={styles.scoreHeader}>
+                  Third Set Score
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.checkbox}>
+                  <Checkbox
+                    status={isChecked ? "checked" : "unchecked"}
+                    onPress={() => {
+                      setChecked(!isChecked);
+                    }}
+                  />
+                </View>
+                <ScoreInput
+                  placeholder={isChecked ? "e.g. 10-5" : "e.g. 7-5"}
+                  value={thirdSetInput}
+                  setValue={setThirdSetInput}
+                  error={thirdSetScoreError}
+                  setError={setThirdSetScoreError}
+                  readOnly={!thirdSetRequired}
+                  maxChars={isChecked ? 5 : 3}
+                  isTiebreak={isChecked ? true : false}
+                />
+              </View>
+            </>
+          ) : null}
+          <View style={styles.matchReport}>
+            <CustomInput
+              placeholder="Optional: Write match report here..."
+              value={matchNotesInput}
+              setValue={setMatchNotesInput}
+              formIcon="notes"
+              secureTextEntry={false}
             />
           </View>
 
           <CustomButton
-            text="Submit"
+            text="Submit Result"
             onPress={onSumbitPress}
             disabled={false}
           />
@@ -199,7 +246,24 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
   },
-  scoreHeader: { color: "#2B2D42", paddingTop: 20 },
+  scoreHeader: {
+    flex: 1,
+    textAlign: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#2B2D42",
+    marginTop: 10,
+  },
+  checkbox: {
+    flex: 1,
+    padding: 10,
+    margin: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  matchReport: {
+    margin: 10,
+  },
   dropdown1: {
     zIndex: 999,
   },

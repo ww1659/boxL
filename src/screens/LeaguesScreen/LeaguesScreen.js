@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { startCase } from "lodash";
 import { fetchLeaguesByUserId } from "../../utils/api";
@@ -28,28 +28,27 @@ const LeaguesScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView>
-      <View style={styles.root}>
-        {/* <Image source={LogoInverse} style={[styles.logo]} resizeMode="contain" /> */}
-        <Text style={styles.header}>Welcome, {firstName}</Text>
-        <Text style={[styles.header, styles.leagueHeader]}>Your Leagues</Text>
-        <FlatList
-          data={leagues}
-          renderItem={({ item }) => (
+    <ScrollView>
+      <SafeAreaView>
+        <View style={styles.root}>
+          {/* <Image source={LogoInverse} style={[styles.logo]} resizeMode="contain" /> */}
+          <Text style={styles.header}>Welcome, {firstName}</Text>
+          <Text style={[styles.header, styles.leagueHeader]}>Your Leagues</Text>
+          {leagues.map((league) => (
             <LeagueCard
-              leagueId={item.league_id}
-              leagueName={item.name}
-              clubId={item.club_id}
-              startDate={item.start_date}
-              endDate={item.end_date}
-              format={item.format}
-              onPress={() => navigateToIndividualLeague(item.league_id)}
+              key={league.league_id}
+              leagueId={league.league_id}
+              leagueName={league.name}
+              clubId={league.club_id}
+              startDate={league.start_date}
+              endDate={league.end_date}
+              format={league.format}
+              onPress={() => navigateToIndividualLeague(league.league_id)}
             />
-          )}
-          keyExtractor={(item) => item.league_id.toString()}
-        ></FlatList>
-      </View>
-    </SafeAreaView>
+          ))}
+        </View>
+      </SafeAreaView>
+    </ScrollView>
   );
 };
 
