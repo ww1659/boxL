@@ -21,6 +21,7 @@ const SignInScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [noUsernameError, setNoUsernameError] = useState(false);
   const [noPasswordError, setNoPasswordError] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const { height } = useWindowDimensions();
 
@@ -37,7 +38,8 @@ const SignInScreen = ({ navigation }) => {
 
     setLoginLoading(true);
     try {
-      const response = await login({ username, password });
+      const formattedUsername = username.trim().toLowerCase();
+      const response = await login({ formattedUsername, password });
       if (response.status === true) {
         setLoginLoading(false);
         navigation.navigate("BottomTabs");
@@ -88,8 +90,10 @@ const SignInScreen = ({ navigation }) => {
             value={password}
             setValue={setPassword}
             formIcon="lock"
-            secureTextEntry={true}
             error={noPasswordError}
+            secureTextEntry={!isPasswordVisible}
+            isPasswordVisible={isPasswordVisible}
+            setIsPasswordVisible={setIsPasswordVisible}
           />
           <CustomButton
             text="Sign In"

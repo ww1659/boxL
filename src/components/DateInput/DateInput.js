@@ -1,23 +1,20 @@
 import React, { useState } from "react";
 import { StyleSheet, View, TextInput, Button } from "react-native";
 
-const DateInput = () => {
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-
+const DateInput = ({ dateInput, setDateInput }) => {
   const handleDateChange = (newDate) => {
     // You may want to add some validation for the new date here
-    setDate(newDate);
+    setDateInput(newDate);
   };
 
   return (
     <View style={styles.container}>
       <TextInput
-        style={styles.input}
-        value={date}
+        style={styles.text}
+        value={dateInput}
         onChangeText={handleDateChange}
         keyboardType="numeric"
       />
-      {/* You can add a button here to submit the date or perform any action */}
     </View>
   );
 };
@@ -32,8 +29,10 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10,
   },
-  input: {
-    text: { color: "#2B2D42", fontSize: 18 },
+  text: {
+    color: "#2B2D42",
+    fontSize: 18,
+    width: "100%",
   },
 });
 export default DateInput;

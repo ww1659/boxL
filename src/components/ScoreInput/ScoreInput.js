@@ -12,7 +12,6 @@ const ScoreInput = ({
   setError,
   readOnly,
   maxChars,
-  setSetsEntered,
   isTiebreak,
 }) => {
   const [showIcon, setShowIcon] = useState(false);
@@ -28,7 +27,6 @@ const ScoreInput = ({
     } else {
       isValid = validateScore(score);
     }
-    setSetsEntered((current) => current + 1);
     setError(!isValid);
   };
 
@@ -48,7 +46,7 @@ const ScoreInput = ({
           <MaterialCommunityIcons
             style={styles.icon}
             name={error ? "alert-box-outline" : "hand-okay"}
-            size={24}
+            size={20}
             color={error ? "#D90429" : "#008000"}
           />
         ) : null}
@@ -62,7 +60,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scoreInput: {
-    borderWidth: 1,
     flexDirection: "row",
     backgroundColor: "white",
     borderColor: "#2B2D42",

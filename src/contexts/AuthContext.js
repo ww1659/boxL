@@ -15,7 +15,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (userInput) => {
     try {
-      const response = await loginUser(userInput);
+      const user = {
+        username: userInput.formattedUsername,
+        password: userInput.password,
+      };
+      const response = await loginUser(user);
       if (response.status === true) {
         const user = response.user;
         setUser({

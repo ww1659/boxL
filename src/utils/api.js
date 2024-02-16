@@ -45,3 +45,9 @@ export const fetchStandingsByLeagueId = (leagueId) => {
     return res.data.standings;
   });
 };
+
+export const postResult = (result) => {
+  return myApi.post(`/results`, result).then((res) => {
+    return res.data.result;
+  });
+};

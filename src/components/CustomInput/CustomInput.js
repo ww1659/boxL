@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TextInput, StyleSheet } from "react-native";
+import { View, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const CustomInput = ({
@@ -9,7 +9,13 @@ const CustomInput = ({
   secureTextEntry,
   formIcon,
   error,
+  isPasswordVisible,
+  setIsPasswordVisible,
 }) => {
+  const handleVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
   return (
     <View style={[styles.container, error && styles.error]}>
       <MaterialIcons
@@ -25,6 +31,16 @@ const CustomInput = ({
         placeholder={placeholder}
         secureTextEntry={secureTextEntry}
       />
+      {isPasswordVisible !== undefined ? (
+        <TouchableOpacity onPress={handleVisibility}>
+          <MaterialIcons
+            style={styles.eyeIcon}
+            name={isPasswordVisible ? "visibility-off" : "visibility"}
+            size={24}
+            color={error ? "#D90429" : "#2B2D42"}
+          />
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };
@@ -45,6 +61,7 @@ const styles = StyleSheet.create({
   },
   text: { color: "#2B2D42", fontSize: 18, width: "100%" },
   icon: { marginRight: 10 },
+  eyeIcon: { marginLeft: 10 },
 });
 
 export default CustomInput;

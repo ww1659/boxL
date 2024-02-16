@@ -18,6 +18,7 @@ import ScoreInput from "../../components/ScoreInput/ScoreInput";
 import CustomButton from "../../components/CustomButton";
 import DateInput from "../../components/DateInput/DateInput";
 import CustomInput from "../../components/CustomInput";
+import { postResult } from "../../utils/api";
 
 const PostResultScreen = () => {
   //user inputs states
@@ -26,8 +27,12 @@ const PostResultScreen = () => {
   const [firstSetInput, setFirstSetInput] = useState("");
   const [secondSetInput, setSecondSetInput] = useState("");
   const [thirdSetInput, setThirdSetInput] = useState("");
+  const [isChecked, setChecked] = useState(false);
   const [courtNumberInput, setCourtNumberInput] = useState("");
   const [courtSurfaceInput, setCourtSurfaceInput] = useState("");
+  const [dateInput, setDateInput] = useState(
+    new Date().toISOString().slice(0, 10)
+  );
   const [matchNotesInput, setMatchNotesInput] = useState("");
 
   //error states
@@ -38,8 +43,7 @@ const PostResultScreen = () => {
   // logic states
   const [thirdSetRequired, setThirdSetRequired] = useState(false);
   const [courtDropdownVisible, setCourtDropdownVisible] = useState(false);
-  const [setsEntered, setSetsEntered] = useState(0);
-  const [isChecked, setChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   //contexts
   const {
@@ -53,6 +57,8 @@ const PostResultScreen = () => {
   } = useLeagueData();
   const { user } = useAuth();
 
+  console.log(standings);
+
   //exported functions
   const availablePlayers = findPlayersInSameGroup(standings, players, user);
 
@@ -64,15 +70,14 @@ const PostResultScreen = () => {
 
   useEffect(() => {
     if (
-      firstSetInput &&
-      secondSetInput &&
-      setsEntered >= 2 &&
+      firstSetInput.length === 3 &&
+      secondSetInput.length === 3 &&
       !firstSetScoreError &&
       !secondSetScoreError
     ) {
       updateThirdSetRequirement();
     }
-  }, [firstSetInput, secondSetInput, setsEntered]);
+  }, [firstSetInput, secondSetInput]);
 
   //toggle visibility functions
   const toggleDropdownVisibility = () => {
@@ -93,12 +98,58 @@ const PostResultScreen = () => {
     setCourtSurfaceInput(club.court_surface[court - 1]);
   };
 
+  //handling SUBMIT button
   const onSumbitPress = async (event) => {
     event.preventDefault();
-    console.log("SUBMIT PRESSED");
-  };
+    setIsLoading(true);
 
-  //LOGS
+    if (
+      !winnerInput ||
+      !loserInput ||
+      !dateInput ||
+      !courtNumberInput ||
+      !courtSurfaceInput ||
+      !firstSetInput ||
+      !secondSetInput ||
+      (thirdSetRequired && !thirdSetInput)
+    ) {
+      console.log("Fill out required fields");
+      return;
+    }
+
+    const winner = players.find((player) => player.name === winnerInput);
+    const loser = players.find((player) => player.name === loserInput);
+    const winnerId = winner.user_id;
+    const loserId = loser.user_id;
+    const leagueId = standings[0].league_id;
+
+    const result = {
+      league_id: leagueId,
+      winner_id: winnerId,
+      loser_id: loserId,
+      group_name: "A",
+      first_set_score: firstSetInput,
+      first_set_tiebreak: "",
+      second_set_score: secondSetInput,
+      second_set_tiebreak: "",
+      third_set_score: thirdSetRequired && !isChecked ? thirdSetInput : "",
+      third_set_tiebreak: "",
+      championship_tiebreak: isChecked,
+      championship_tiebreak_score:
+        thirdSetRequired && isChecked ? thirdSetInput : "",
+      match_date: dateInput,
+      club_id: club.club_id,
+      court_number: courtNumberInput,
+      court_surface: courtSurfaceInput,
+      match_notes: matchNotesInput,
+    };
+
+    try {
+      const newResult = await postResult(result);
+    } catch (err) {
+      throw err;
+    }
+  };
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -133,14 +184,14 @@ const PostResultScreen = () => {
           </View>
           <View style={styles.row}>
             <Text variant="bodyLarge" style={styles.scoreHeader}>
-              Date:
+              Date
             </Text>
             <Text variant="bodyLarge" style={styles.scoreHeader}>
-              Court:
+              Court
             </Text>
           </View>
           <View style={[styles.row, styles.dropdown2]}>
-            <DateInput />
+            <DateInput dateInput={dateInput} setDateInput={setDateInput} />
             <CourtDropdown
               numberOfCourts={club.number_of_courts}
               onSelect={handleCourtSelect}
@@ -165,8 +216,6 @@ const PostResultScreen = () => {
               error={firstSetScoreError}
               setError={setFirstSetScoreError}
               maxChars={3}
-              setsEntered={setsEntered}
-              setSetsEntered={setSetsEntered}
             />
             <ScoreInput
               placeholder="e.g. 7-6"
@@ -175,21 +224,14 @@ const PostResultScreen = () => {
               error={secondSetScoreError}
               setError={setSecondSetScoreError}
               maxChars={3}
-              setsEntered={setsEntered}
-              setSetsEntered={setSetsEntered}
             />
           </View>
           {thirdSetRequired ? (
             <>
               <View style={styles.row}>
-                <Text variant="bodyLarge" style={styles.scoreHeader}>
+                <Text variant="bodyLarge" style={styles.checkboxHeader}>
                   Champs Tiebreak:
                 </Text>
-                <Text variant="bodyLarge" style={styles.scoreHeader}>
-                  Third Set Score
-                </Text>
-              </View>
-              <View style={styles.row}>
                 <View style={styles.checkbox}>
                   <Checkbox
                     status={isChecked ? "checked" : "unchecked"}
@@ -198,6 +240,11 @@ const PostResultScreen = () => {
                     }}
                   />
                 </View>
+              </View>
+              <View style={styles.row}>
+                <Text variant="bodyLarge" style={styles.scoreHeader}>
+                  Third Set Score
+                </Text>
                 <ScoreInput
                   placeholder={isChecked ? "e.g. 10-5" : "e.g. 7-5"}
                   value={thirdSetInput}
@@ -253,14 +300,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     color: "#2B2D42",
     marginTop: 10,
+    fontWeight: "bold",
   },
-  checkbox: {
+  checkboxHeader: {
     flex: 1,
-    padding: 10,
-    margin: 10,
+    paddingHorizontal: 10,
+    marginHorizontal: 10,
     alignItems: "center",
     justifyContent: "center",
   },
+  checkbox: {
+    flex: 1,
+    paddingHorizontal: 10,
+    marginHorizontal: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxSize: {},
   matchReport: {
     margin: 10,
   },
