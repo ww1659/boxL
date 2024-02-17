@@ -47,7 +47,14 @@ export const fetchStandingsByLeagueId = (leagueId) => {
 };
 
 export const postResult = (result) => {
+  console.log(result, "API POST");
   return myApi.post(`/results`, result).then((res) => {
     return res.data.result;
+  });
+};
+
+export const patchStandings = (result) => {
+  return myApi.patch(`/standings`, result).then((res) => {
+    return res.data.updatedStandings;
   });
 };

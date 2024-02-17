@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, ScrollView, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, Checkbox } from "react-native-paper";
+import { Text, Checkbox, ProgressBar } from "react-native-paper";
 
 //context imports
 import { useLeagueData } from "../../contexts/LeagueDataContext";
@@ -18,9 +18,9 @@ import ScoreInput from "../../components/ScoreInput/ScoreInput";
 import CustomButton from "../../components/CustomButton";
 import DateInput from "../../components/DateInput/DateInput";
 import CustomInput from "../../components/CustomInput";
-import { postResult } from "../../utils/api";
+import { patchStandings, postResult } from "../../utils/api";
 
-const PostResultScreen = () => {
+const PostResultScreen = ({ navigation }) => {
   //user inputs states
   const [winnerInput, setWinnerInput] = useState("");
   const [loserInput, setLoserInput] = useState("");
@@ -43,7 +43,7 @@ const PostResultScreen = () => {
   // logic states
   const [thirdSetRequired, setThirdSetRequired] = useState(false);
   const [courtDropdownVisible, setCourtDropdownVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
   //contexts
   const {
@@ -56,8 +56,6 @@ const PostResultScreen = () => {
     loading,
   } = useLeagueData();
   const { user } = useAuth();
-
-  console.log(standings);
 
   //exported functions
   const availablePlayers = findPlayersInSameGroup(standings, players, user);
@@ -101,7 +99,7 @@ const PostResultScreen = () => {
   //handling SUBMIT button
   const onSumbitPress = async (event) => {
     event.preventDefault();
-    setIsLoading(true);
+    setIsSubmitLoading(true);
 
     if (
       !winnerInput ||
@@ -111,8 +109,9 @@ const PostResultScreen = () => {
       !courtSurfaceInput ||
       !firstSetInput ||
       !secondSetInput ||
-      (thirdSetRequired && !thirdSetInput)
+      (thirdSetRequired && !third_set_score && !championship_tiebreak_score)
     ) {
+      setIsSubmitLoading(false);
       console.log("Fill out required fields");
       return;
     }
@@ -146,10 +145,23 @@ const PostResultScreen = () => {
 
     try {
       const newResult = await postResult(result);
+      const updatedStandings = await patchStandings(result);
+      setIsSubmitLoading(false);
+      navigation.navigate("IndividualLeagueScreen");
     } catch (err) {
       throw err;
     }
   };
+
+  if (isSubmitLoading)
+    return (
+      <SafeAreaView style={styles.loading}>
+        <View>
+          <Text style={styles.loadingText}>Please Wait...</Text>
+          <ProgressBar progress={1} />
+        </View>
+      </SafeAreaView>
+    );
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -308,6 +320,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     alignItems: "center",
     justifyContent: "center",
+    fontWeight: "bold",
   },
   checkbox: {
     flex: 1,
@@ -319,6 +332,16 @@ const styles = StyleSheet.create({
   checkboxSize: {},
   matchReport: {
     margin: 10,
+  },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginVertical: 5,
+    fontSize: 24,
+    color: "#2B2D42",
   },
   dropdown1: {
     zIndex: 999,
