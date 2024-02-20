@@ -3,6 +3,7 @@ import { View, TextInput, StyleSheet } from "react-native";
 import { validateScore } from "../../utils/validateScore";
 import { validateChampsTiebreak } from "../../utils/validateChampsTiebreak";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { validateThirdSetScore } from "../../utils/validateThirdSetScore";
 
 const ScoreInput = ({
   value,
@@ -10,20 +11,20 @@ const ScoreInput = ({
   placeholder,
   error,
   setError,
-  readOnly,
+  thirdSet,
   maxChars,
   isTiebreak,
 }) => {
   const [showIcon, setShowIcon] = useState(false);
 
-  console.log(showIcon);
-
   const validate = (event) => {
-    const score = event.target.value;
+    const score = event.nativeEvent.text;
     setShowIcon(true);
     let isValid;
     if (isTiebreak) {
       isValid = validateChampsTiebreak(score);
+    } else if (thirdSet) {
+      isValid = validateThirdSetScore(score);
     } else {
       isValid = validateScore(score);
     }
@@ -37,16 +38,15 @@ const ScoreInput = ({
           style={styles.text}
           value={value}
           onChangeText={setValue}
-          onBlur={validate}
+          onEndEditing={validate}
           placeholder={placeholder}
           maxLength={maxChars}
-          readOnly={readOnly}
         />
         {showIcon ? (
           <MaterialCommunityIcons
             style={styles.icon}
             name={error ? "alert-box-outline" : "hand-okay"}
-            size={20}
+            size={24}
             color={error ? "#D90429" : "#008000"}
           />
         ) : null}
@@ -67,12 +67,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     margin: 10,
+    alignItems: "center",
   },
   error: {
     borderColor: "#D90429",
   },
-  text: { color: "#2B2D42", fontSize: 18, width: "100%" },
-  icon: { marginLeft: 10 },
+  text: {
+    color: "#2B2D42",
+    fontSize: 20,
+    fontWeight: "500",
+    flex: 4,
+  },
+  icon: { marginLeft: 10, flex: 1 },
 });
 
 export default ScoreInput;

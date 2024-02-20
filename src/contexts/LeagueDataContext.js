@@ -43,6 +43,24 @@ export const LeagueDataProvider = ({ leagueId, children }) => {
     fetchData();
   }, [leagueId]);
 
+  const refreshStandings = async () => {
+    try {
+      const updatedStandings = await fetchStandingsByLeagueId(leagueId);
+      setStandings(updatedStandings);
+    } catch (error) {
+      console.error("error refreshing standings:", error);
+    }
+  };
+
+  const refreshResults = async () => {
+    try {
+      const updatedResults = await fetchResultsByLeagueId(leagueId);
+      setResults(updatedResults);
+    } catch (error) {
+      console.error("error refreshing results:", error);
+    }
+  };
+
   return (
     <LeagueDataContext.Provider
       value={{
@@ -54,6 +72,8 @@ export const LeagueDataProvider = ({ leagueId, children }) => {
         loading,
         setStandings,
         setResults,
+        refreshStandings,
+        refreshResults,
       }}
     >
       {children}

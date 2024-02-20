@@ -35,16 +35,19 @@ const LeaguesScreen = ({ navigation }) => {
           <Text style={styles.header}>Welcome, {firstName}</Text>
           <Text style={[styles.header, styles.leagueHeader]}>Your Leagues</Text>
           {leagues.map((league) => (
-            <LeagueCard
-              key={league.league_id}
-              leagueId={league.league_id}
-              leagueName={league.name}
-              clubId={league.club_id}
-              startDate={league.start_date}
-              endDate={league.end_date}
-              format={league.format}
-              onPress={() => navigateToIndividualLeague(league.league_id)}
-            />
+            <View style={styles.leagueCard} key={league.league_id}>
+              <LeagueCard
+                leagueId={league.league_id}
+                leagueName={league.name}
+                clubId={league.club_id}
+                startDate={league.start_date}
+                endDate={league.end_date}
+                format={league.format}
+                adminId={league.admin}
+                userId={user.userId}
+                onPress={() => navigateToIndividualLeague(league.league_id)}
+              />
+            </View>
           ))}
         </View>
       </SafeAreaView>
@@ -65,7 +68,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 30,
-    paddingVertical: 10,
+    paddingBottom: 10,
     textAlign: "left",
     color: "#2B2D42",
   },
@@ -73,4 +76,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  leagueCard: { paddingBottom: 10 },
 });

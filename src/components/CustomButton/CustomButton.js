@@ -9,6 +9,8 @@ const CustomButton = ({
   bgColour,
   fgColour,
 }) => {
+  const opacity = disabled ? 0.5 : 1;
+
   return (
     <Pressable
       onPress={onPress}
@@ -17,6 +19,7 @@ const CustomButton = ({
         styles.button,
         styles[`button_${type}`],
         bgColour ? { backgroundColor: bgColour } : {},
+        { opacity },
       ]}
     >
       <Text

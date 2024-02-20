@@ -6,6 +6,6 @@ export const formatDateLong = (dateString) => {
 
 export const formatDateShort = (dateString) => {
   const date = new Date(dateString);
-  const options = { day: "numeric", month: "short" };
+  const options = { weekday: "short", day: "numeric", month: "short" };
   return date.toLocaleDateString("en-GB", options);
 };

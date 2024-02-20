@@ -14,12 +14,6 @@ export const validateChampsTiebreak = (score) => {
         } else if (p1 > 10 && p1 - p2 === 2) {
           return true;
         }
-      } else if (p2 > p1) {
-        if (p2 === 10 && p2 - p1 >= 2) {
-          return true;
-        } else if (p2 > 10 && p2 - p1 === 2) {
-          return true;
-        }
       }
     }
   }

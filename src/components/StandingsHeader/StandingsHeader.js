@@ -1,17 +1,7 @@
 import React from "react";
 import { DataTable } from "react-native-paper";
 
-const StandingsHeader = ({
-  leagueId,
-  group,
-  player,
-  matchesPlayed,
-  wins,
-  setsWon,
-  setsLost,
-  gamesWon,
-  gamesLost,
-}) => {
+const StandingsHeader = () => {
   return (
     <DataTable.Header>
       <DataTable.Title>Player</DataTable.Title>

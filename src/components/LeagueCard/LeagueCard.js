@@ -25,10 +25,17 @@ const LeagueCard = ({
   endDate,
   format,
   onPress,
+  adminId,
+  userId,
 }) => {
   const [clubName, setClubName] = useState("");
   const [clubImage, setClubImage] = useState("");
   const [loading, setLoading] = useState(true);
+
+  console.log(adminId, userId);
+
+  let isAdmin = false;
+  if (adminId === userId) isAdmin = true;
 
   useEffect(() => {
     fetchClubsById(clubId)
@@ -62,6 +69,11 @@ const LeagueCard = ({
               </Text>
               <Text variant="bodyMedium">Format: {changeFormat(format)}</Text>
             </Card.Content>
+            {isAdmin ? (
+              <Card.Actions>
+                <Button>Add Player to League</Button>
+              </Card.Actions>
+            ) : null}
           </>
         )}
       </Card>

@@ -2,8 +2,6 @@ import React from "react";
 import { DataTable } from "react-native-paper";
 
 const StandingsRow = ({
-  leagueId,
-  group,
   player,
   matchesPlayed,
   wins,

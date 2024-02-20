@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, ScrollView, TextInput } from "react-native";
+import { ActivityIndicator, StyleSheet, View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, Checkbox, ProgressBar } from "react-native-paper";
+import { Text, Checkbox } from "react-native-paper";
 
 //context imports
 import { useLeagueData } from "../../contexts/LeagueDataContext";
@@ -12,15 +12,21 @@ import { findPlayersInSameGroup } from "../../utils/findPlayersInSameGroup";
 import { checkStraightSets } from "../../utils/checkStraightSetsWin";
 
 //components
-import CustomDropdown from "../../components/CustomDropDown/CustomDropdown";
-import CourtDropdown from "../../components/CourtDropDown";
+import PlayerDropDown from "../../components/PlayerDropDown";
 import ScoreInput from "../../components/ScoreInput/ScoreInput";
 import CustomButton from "../../components/CustomButton";
 import DateInput from "../../components/DateInput/DateInput";
 import CustomInput from "../../components/CustomInput";
 import { patchStandings, postResult } from "../../utils/api";
+import { startCase } from "lodash";
 
-const PostResultScreen = ({ navigation }) => {
+const sentenceCase = (name) => {
+  return startCase(name.split(" "));
+};
+
+const PostResultScreen = ({ route, navigation }) => {
+  const { isUserAdmin } = route.params;
+
   //user inputs states
   const [winnerInput, setWinnerInput] = useState("");
   const [loserInput, setLoserInput] = useState("");
@@ -42,19 +48,11 @@ const PostResultScreen = ({ navigation }) => {
 
   // logic states
   const [thirdSetRequired, setThirdSetRequired] = useState(false);
-  const [courtDropdownVisible, setCourtDropdownVisible] = useState(false);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
   //contexts
-  const {
-    standings,
-    results,
-    players,
-    club,
-    setStandings,
-    setResults,
-    loading,
-  } = useLeagueData();
+  const { standings, players, club, refreshStandings, refreshResults } =
+    useLeagueData();
   const { user } = useAuth();
 
   //exported functions
@@ -66,6 +64,26 @@ const PostResultScreen = ({ navigation }) => {
     setThirdSetRequired(!isStraightSets);
   };
 
+  //function to generate array of player names
+  let playerNames = [];
+  if (isUserAdmin) {
+    playerNames = players.map((player) => ({
+      label: sentenceCase(player.name),
+      value: player.name,
+    }));
+  } else {
+    playerNames = availablePlayers.map((player) => ({
+      label: sentenceCase(player.name),
+      value: player.name,
+    }));
+  }
+
+  //function to generate array of court numbers
+  const courtNumbers = [];
+  for (let i = 1; i <= club.number_of_courts; i++) {
+    courtNumbers.push({ label: i, value: i });
+  }
+
   useEffect(() => {
     if (
       firstSetInput.length === 3 &&
@@ -76,11 +94,6 @@ const PostResultScreen = ({ navigation }) => {
       updateThirdSetRequirement();
     }
   }, [firstSetInput, secondSetInput]);
-
-  //toggle visibility functions
-  const toggleDropdownVisibility = () => {
-    setCourtDropdownVisible(!courtDropdownVisible);
-  };
 
   //handling form functions
   const handleWinnerSelect = (player) => {
@@ -96,6 +109,25 @@ const PostResultScreen = ({ navigation }) => {
     setCourtSurfaceInput(club.court_surface[court - 1]);
   };
 
+  const isSubmitDisabled = () => {
+    if (
+      !winnerInput ||
+      !loserInput ||
+      !dateInput ||
+      !courtNumberInput ||
+      !courtSurfaceInput ||
+      !firstSetInput ||
+      firstSetScoreError ||
+      !secondSetInput ||
+      secondSetScoreError ||
+      (thirdSetRequired && !thirdSetInput) ||
+      thirdSetScoreError
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   //handling SUBMIT button
   const onSumbitPress = async (event) => {
     event.preventDefault();
@@ -109,10 +141,10 @@ const PostResultScreen = ({ navigation }) => {
       !courtSurfaceInput ||
       !firstSetInput ||
       !secondSetInput ||
-      (thirdSetRequired && !third_set_score && !championship_tiebreak_score)
+      (thirdSetRequired && !thirdSetInput)
     ) {
       setIsSubmitLoading(false);
-      console.log("Fill out required fields");
+      console.log("fill out required fields");
       return;
     }
 
@@ -146,8 +178,10 @@ const PostResultScreen = ({ navigation }) => {
     try {
       const newResult = await postResult(result);
       const updatedStandings = await patchStandings(result);
+      refreshStandings();
+      refreshResults();
       setIsSubmitLoading(false);
-      navigation.navigate("IndividualLeagueScreen");
+      navigation.navigate("IndividualLeague");
     } catch (err) {
       throw err;
     }
@@ -157,137 +191,132 @@ const PostResultScreen = ({ navigation }) => {
     return (
       <SafeAreaView style={styles.loading}>
         <View>
-          <Text style={styles.loadingText}>Please Wait...</Text>
-          <ProgressBar progress={1} />
+          <Text style={styles.loadingText}>Submitting Result...</Text>
+          <ActivityIndicator size="large" />
         </View>
       </SafeAreaView>
     );
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <SafeAreaView>
-        <View style={styles.root}>
-          <Text variant="displaySmall" style={styles.header}>
-            Add New Result
+    <SafeAreaView>
+      <View style={styles.root}>
+        <Text variant="displaySmall" style={styles.header}>
+          Add New Result
+        </Text>
+        <View style={styles.row}>
+          <Text variant="bodyLarge" style={styles.scoreHeader}>
+            WINNER
           </Text>
-          <View style={styles.row}>
-            <Text variant="bodyLarge" style={styles.scoreHeader}>
-              WINNER
-            </Text>
-            <Text variant="bodyLarge" style={styles.scoreHeader}>
-              LOSER
-            </Text>
-          </View>
-          <View style={[styles.row, styles.dropdown1]}>
-            <CustomDropdown
-              players={availablePlayers}
-              onSelect={handleWinnerSelect}
-              label="Winner"
-              winnerInput={winnerInput}
-              loserInput={loserInput}
-            />
-            <CustomDropdown
-              players={availablePlayers}
-              onSelect={handleLoserSelect}
-              label="Loser"
-              winnerInput={winnerInput}
-              loserInput={loserInput}
-            />
-          </View>
-          <View style={styles.row}>
-            <Text variant="bodyLarge" style={styles.scoreHeader}>
-              Date
-            </Text>
-            <Text variant="bodyLarge" style={styles.scoreHeader}>
-              Court
-            </Text>
-          </View>
-          <View style={[styles.row, styles.dropdown2]}>
-            <DateInput dateInput={dateInput} setDateInput={setDateInput} />
-            <CourtDropdown
-              numberOfCourts={club.number_of_courts}
-              onSelect={handleCourtSelect}
-              label={"Select Court"}
-              courtDropdownVisible={courtDropdownVisible}
-              toggleDropdownVisibility={toggleDropdownVisibility}
-            />
-          </View>
-          <View style={styles.row}>
-            <Text variant="bodyLarge" style={styles.scoreHeader}>
-              First Set Score
-            </Text>
-            <Text variant="bodyLarge" style={styles.scoreHeader}>
-              Second Set Score
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <ScoreInput
-              placeholder="e.g. 6-3"
-              value={firstSetInput}
-              setValue={setFirstSetInput}
-              error={firstSetScoreError}
-              setError={setFirstSetScoreError}
-              maxChars={3}
-            />
-            <ScoreInput
-              placeholder="e.g. 7-6"
-              value={secondSetInput}
-              setValue={setSecondSetInput}
-              error={secondSetScoreError}
-              setError={setSecondSetScoreError}
-              maxChars={3}
-            />
-          </View>
-          {thirdSetRequired ? (
-            <>
-              <View style={styles.row}>
-                <Text variant="bodyLarge" style={styles.checkboxHeader}>
-                  Champs Tiebreak:
-                </Text>
-                <View style={styles.checkbox}>
-                  <Checkbox
-                    status={isChecked ? "checked" : "unchecked"}
-                    onPress={() => {
-                      setChecked(!isChecked);
-                    }}
-                  />
-                </View>
-              </View>
-              <View style={styles.row}>
-                <Text variant="bodyLarge" style={styles.scoreHeader}>
-                  Third Set Score
-                </Text>
-                <ScoreInput
-                  placeholder={isChecked ? "e.g. 10-5" : "e.g. 7-5"}
-                  value={thirdSetInput}
-                  setValue={setThirdSetInput}
-                  error={thirdSetScoreError}
-                  setError={setThirdSetScoreError}
-                  readOnly={!thirdSetRequired}
-                  maxChars={isChecked ? 5 : 3}
-                  isTiebreak={isChecked ? true : false}
-                />
-              </View>
-            </>
-          ) : null}
-          <View style={styles.matchReport}>
-            <CustomInput
-              placeholder="Optional: Write match report here..."
-              value={matchNotesInput}
-              setValue={setMatchNotesInput}
-              formIcon="notes"
-              secureTextEntry={false}
-            />
-          </View>
-
-          <CustomButton
-            text="Submit Result"
-            onPress={onSumbitPress}
-            disabled={false}
+          <Text variant="bodyLarge" style={styles.scoreHeader}>
+            LOSER
+          </Text>
+        </View>
+        <View style={styles.row}>
+          <PlayerDropDown
+            items={playerNames}
+            value={winnerInput}
+            setValue={handleWinnerSelect}
+            label={"Select a player"}
+          />
+          <PlayerDropDown
+            items={playerNames}
+            value={loserInput}
+            setValue={handleLoserSelect}
+            label={"Select a player"}
           />
         </View>
-      </SafeAreaView>
-    </ScrollView>
+        <View style={styles.row}>
+          <Text variant="bodyLarge" style={styles.scoreHeader}>
+            Date
+          </Text>
+          <Text variant="bodyLarge" style={styles.scoreHeader}>
+            Court
+          </Text>
+        </View>
+        <View style={styles.row}>
+          <DateInput dateInput={dateInput} setDateInput={setDateInput} />
+          <PlayerDropDown
+            items={courtNumbers}
+            value={courtNumberInput}
+            setValue={handleCourtSelect}
+            label={"Select a court"}
+          />
+        </View>
+        <View style={styles.row}>
+          <Text variant="bodyLarge" style={styles.scoreHeader}>
+            First Set Score
+          </Text>
+          <Text variant="bodyLarge" style={styles.scoreHeader}>
+            Second Set Score
+          </Text>
+        </View>
+        <View style={styles.row}>
+          <ScoreInput
+            placeholder="e.g. 6-3"
+            value={firstSetInput}
+            setValue={setFirstSetInput}
+            error={firstSetScoreError}
+            setError={setFirstSetScoreError}
+            maxChars={3}
+          />
+          <ScoreInput
+            placeholder="e.g. 7-6"
+            value={secondSetInput}
+            setValue={setSecondSetInput}
+            error={secondSetScoreError}
+            setError={setSecondSetScoreError}
+            maxChars={3}
+          />
+        </View>
+        {thirdSetRequired ? (
+          <>
+            <View style={styles.row}>
+              <Text variant="bodyLarge" style={styles.checkboxHeader}>
+                Champs Tiebreak:
+              </Text>
+              <View style={styles.checkbox}>
+                <Checkbox
+                  status={isChecked ? "checked" : "unchecked"}
+                  onPress={() => {
+                    setChecked(!isChecked);
+                  }}
+                />
+              </View>
+            </View>
+            <View style={styles.row}>
+              <Text variant="bodyLarge" style={styles.scoreHeader}>
+                Third Set Score
+              </Text>
+              <ScoreInput
+                placeholder={isChecked ? "e.g. 10-5" : "e.g. 7-5"}
+                value={thirdSetInput}
+                setValue={setThirdSetInput}
+                error={thirdSetScoreError}
+                setError={setThirdSetScoreError}
+                thirdSet={thirdSetRequired}
+                maxChars={isChecked ? 5 : 3}
+                isTiebreak={isChecked ? true : false}
+              />
+            </View>
+          </>
+        ) : null}
+        <View style={styles.matchReport}>
+          <CustomInput
+            placeholder="Optional: Write match report here..."
+            value={matchNotesInput}
+            setValue={setMatchNotesInput}
+            formIcon="notes"
+            secureTextEntry={false}
+          />
+        </View>
+
+        <CustomButton
+          text="Submit Result"
+          onPress={onSumbitPress}
+          disabled={isSubmitDisabled()}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -296,7 +325,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   header: {
-    paddingVertical: 10,
+    paddingBottom: 10,
     textAlign: "left",
     color: "#2B2D42",
   },
@@ -329,7 +358,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  checkboxSize: {},
   matchReport: {
     margin: 10,
   },
@@ -342,12 +370,6 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     fontSize: 24,
     color: "#2B2D42",
-  },
-  dropdown1: {
-    zIndex: 999,
-  },
-  dropdown2: {
-    zIndex: 998,
   },
 });
 

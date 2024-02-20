@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "100%",
     borderColor: "#2B2D42",
-    borderWidth: 2,
+    borderWidth: 1,
     borderRadius: 10,
     padding: 10,
     margin: 10,
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
   text: { color: "#2B2D42", fontSize: 18 },
   overlay: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: "#2B2D42",
     position: "absolute",
     top: 45,

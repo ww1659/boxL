@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, FlatList, ScrollView, StyleSheet } from "react-native";
-import { ActivityIndicator, Text } from "react-native-paper";
+import { ActivityIndicator, Divider, Text } from "react-native-paper";
 import { startCase } from "lodash";
 import { formatDateShort } from "../../utils/formatDate";
 
@@ -11,37 +11,59 @@ const getFirstName = (name) => {
 const LeagueResultsScreen = ({ route }) => {
   const { results, loading } = route.params;
 
-  console.log(results);
+  const resultsByDate = results.reduce((acc, result) => {
+    const date = formatDateShort(result.match_date);
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(result);
+    return acc;
+  }, {});
 
   return (
     <ScrollView>
-      <View>
+      <View style={styles.root}>
         {loading ? (
           <ActivityIndicator animating={true} />
         ) : (
-          <FlatList
-            data={results}
-            renderItem={({ item, index }) => (
-              <View style={styles.matchCard}>
-                <View style={styles.matchInfo}>
-                  <Text style={styles.text}>
-                    {formatDateShort(item.match_date)}
-                  </Text>
-                  <Text style={styles.text}>{item.group_name}</Text>
-                  <Text style={styles.text}>
-                    {getFirstName(item.winner_name)}
-                  </Text>
-                  <Text style={styles.text}>{item.first_set_score}</Text>
-                  <Text style={styles.text}>{item.second_set_score}</Text>
-                  <Text style={styles.text}>{item.third_set_score}</Text>
-                  <Text style={styles.text}>
-                    {getFirstName(item.loser_name)}
-                  </Text>
+          <View>
+            {Object.entries(resultsByDate).map(([date, results]) => (
+              <View key={date}>
+                <Text style={styles.dateHeader}>{date}</Text>
+                <View style={styles.headerRow}>
+                  <Text style={[styles.headerText, styles.winner]}>Winner</Text>
+                  <Text style={[styles.headerText, styles.loser]}>Loser</Text>
+                  <Text style={[styles.headerText, styles.score]}>Set 1</Text>
+                  <Text style={[styles.headerText, styles.score]}>Set 2</Text>
+                  <Text style={[styles.headerText, styles.score]}>Set 3</Text>
                 </View>
+                {results.map((item, index) => (
+                  <View key={item.result_id}>
+                    <View style={styles.matchCard}>
+                      <View style={styles.matchInfo}>
+                        <Text style={[styles.text, styles.winner]}>
+                          {getFirstName(item.winner_name)}
+                        </Text>
+                        <Text style={[styles.text, styles.loser]}>
+                          {getFirstName(item.loser_name)}
+                        </Text>
+                        <Text style={[styles.text, styles.score]}>
+                          {item.first_set_score}
+                        </Text>
+                        <Text style={[styles.text, styles.score]}>
+                          {item.second_set_score}
+                        </Text>
+                        <Text style={[styles.text, styles.score]}>
+                          {item.third_set_score}
+                        </Text>
+                      </View>
+                    </View>
+                    <Divider />
+                  </View>
+                ))}
               </View>
-            )}
-            keyExtractor={(item) => item.result_id.toString()}
-          ></FlatList>
+            ))}
+          </View>
         )}
       </View>
     </ScrollView>
@@ -49,21 +71,43 @@ const LeagueResultsScreen = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+  root: {
+    paddingHorizontal: 20,
+  },
+  dateHeader: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginVertical: 10,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 5,
+  },
+  headerText: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
   matchCard: {
-    flexDirection: "row", // Align items horizontally
-    justifyContent: "space-between", // Distribute items evenly along the row
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    marginVertical: 10,
+    paddingVertical: 2,
+    borderRadius: 5,
   },
   matchInfo: {
-    flex: 1, // Take up all available space horizontally
-    flexDirection: "row", // Align items horizontally
-    justifyContent: "space-between", // Distribute items evenly along the row
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   text: {
-    flex: 1, // Take up equal space within the container
-    textAlign: "center", // Center the text horizontally
+    fontSize: 16,
+  },
+  winner: {
+    width: "20%",
+  },
+  loser: {
+    width: "20%",
+  },
+  score: {
+    width: "20%",
   },
 });
 

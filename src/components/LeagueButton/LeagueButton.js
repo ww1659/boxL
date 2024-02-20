@@ -7,7 +7,7 @@ const LeagueButton = ({ text, icon, onPress }) => (
   <View style={styles.button}>
     <Button
       icon={() => (
-        <MaterialCommunityIcons name={icon} size={24} color="#EDF2F4" />
+        <MaterialCommunityIcons name={icon} size={18} color="#EDF2F4" />
       )}
       mode="contained-tonal"
       buttonColor="#2B2D42"
@@ -21,7 +21,8 @@ const LeagueButton = ({ text, icon, onPress }) => (
 
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: 0,
+    flex: 1,
+    margin: 2,
   },
 });
 

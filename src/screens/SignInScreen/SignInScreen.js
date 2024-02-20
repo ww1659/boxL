@@ -17,8 +17,8 @@ import SocialSignInButtons from "../../components/SocialSignInButtons";
 
 const SignInScreen = ({ navigation }) => {
   const { login } = useAuth();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("billy");
+  const [password, setPassword] = useState("hashed_password_1");
   const [noUsernameError, setNoUsernameError] = useState(false);
   const [noPasswordError, setNoPasswordError] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);

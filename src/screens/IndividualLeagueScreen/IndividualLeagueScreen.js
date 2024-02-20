@@ -4,6 +4,7 @@ import { ActivityIndicator, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { startCase } from "lodash";
 import { useLeagueData } from "../../contexts/LeagueDataContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { sortStandings } from "../../utils/sortStandings";
 import LeagueButton from "../../components/LeagueButton/LeagueButton";
 import StandingsRow from "../../components/StandingsRow";
@@ -18,7 +19,12 @@ const getFirstName = (name) => {
 };
 
 const IndividualLeagueScreen = ({ navigation }) => {
-  const { standings, results, league, players, loading } = useLeagueData();
+  const { standings, results, league, players, club, loading } =
+    useLeagueData();
+  const { user } = useAuth();
+
+  let isUserAdmin = false;
+  if (user.userId === league.admin) isUserAdmin = true;
 
   const uniqueGroups = Array.from(
     new Set(standings.map((item) => item.group_name))
@@ -34,7 +40,7 @@ const IndividualLeagueScreen = ({ navigation }) => {
   };
 
   const handlePostResultPress = () => {
-    navigation.navigate("PostResultScreen");
+    navigation.navigate("PostResultScreen", { isUserAdmin });
   };
 
   return (
@@ -47,27 +53,34 @@ const IndividualLeagueScreen = ({ navigation }) => {
             <Text variant="displaySmall" style={styles.header}>
               {league.name}
             </Text>
-            <Text variant="labelLarge">{changeFormat(league.format)}</Text>
-            <View style={styles.buttons}>
-              <View style={styles.buttonsRow}>
-                <LeagueButton
-                  text={"Players"}
-                  icon={"account-group-outline"}
-                  onPress={() => handlePlayersPress()}
-                />
-                <LeagueButton
-                  text={"Results"}
-                  icon={"format-list-numbered"}
-                  onPress={() => handleResultsPress()}
-                />
-                <LeagueButton
-                  text={"Post Result"}
-                  icon={"plus"}
-                  onPress={() => handlePostResultPress()}
-                />
-              </View>
-              <View style={styles.buttonsRow}></View>
+            <View style={styles.infoRow}>
+              <Text variant="labelLarge">{changeFormat(league.format)}</Text>
+              <Text style={styles.test} variant="labelLarge">
+                {" "}
+                .{" "}
+              </Text>
+              <Text variant="labelLarge">{changeFormat(club.name)}</Text>
             </View>
+            <View style={styles.buttonsRow}>
+              <LeagueButton
+                text={"Players"}
+                icon={"account-group-outline"}
+                onPress={() => handlePlayersPress()}
+              />
+              <LeagueButton
+                text={"Results"}
+                icon={"format-list-numbered"}
+                onPress={() => handleResultsPress()}
+              />
+            </View>
+            <View style={styles.buttonsRow}>
+              <LeagueButton
+                text={"Post Result"}
+                icon={"plus"}
+                onPress={() => handlePostResultPress()}
+              />
+            </View>
+            <View style={styles.buttonsRow}></View>
             {uniqueGroups.map((groupName) => (
               <View key={groupName} style={styles.groupContainer}>
                 <Text style={styles.groupTitle}>Group {groupName}</Text>
@@ -98,21 +111,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   header: {
-    paddingVertical: 10,
+    marginBottom: 5,
     textAlign: "left",
     color: "#2B2D42",
   },
-  buttons: { marginVertical: 10 },
+  test: {
+    fontWeight: "bold",
+    fontSize: 24,
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
   buttonsRow: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+    marginVertical: 10,
   },
   groupContainer: {
-    marginTop: 5,
+    marginBottom: 30,
   },
   groupTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
   },
 });
