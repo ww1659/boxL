@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
+  ActivityIndicator,
   Text,
   View,
   Image,
@@ -64,7 +65,7 @@ const SignInScreen = ({ navigation }) => {
       <SafeAreaView style={styles.loading}>
         <View>
           <Text style={styles.loadingText}>Signing you in...</Text>
-          <ProgressBar progress={1} />
+          <ActivityIndicator size="large" />
         </View>
       </SafeAreaView>
     );

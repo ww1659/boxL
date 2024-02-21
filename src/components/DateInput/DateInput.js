@@ -3,7 +3,6 @@ import { StyleSheet, View, TextInput, Button } from "react-native";
 
 const DateInput = ({ dateInput, setDateInput }) => {
   const handleDateChange = (newDate) => {
-    // You may want to add some validation for the new date here
     setDateInput(newDate);
   };
 

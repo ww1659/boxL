@@ -69,11 +69,11 @@ const LeagueCard = ({
               </Text>
               <Text variant="bodyMedium">Format: {changeFormat(format)}</Text>
             </Card.Content>
-            {isAdmin ? (
+            {/* {isAdmin ? (
               <Card.Actions>
                 <Button>Add Player to League</Button>
               </Card.Actions>
-            ) : null}
+            ) : null} */}
           </>
         )}
       </Card>

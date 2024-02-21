@@ -24,18 +24,12 @@ const PlayerDropDown = ({ items, value, setValue, label }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    borderWidth: 1,
   },
   dropdown: {
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
     width: "100%",
-  },
-  overlay: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
 

@@ -19,6 +19,7 @@ import DateInput from "../../components/DateInput/DateInput";
 import CustomInput from "../../components/CustomInput";
 import { patchStandings, postResult } from "../../utils/api";
 import { startCase } from "lodash";
+import CustomDatePicker from "../../components/CustomDatePicker/CustomDatePicker";
 
 const sentenceCase = (name) => {
   return startCase(name.split(" "));
@@ -49,6 +50,7 @@ const PostResultScreen = ({ route, navigation }) => {
   // logic states
   const [thirdSetRequired, setThirdSetRequired] = useState(false);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
+  const [showDate, setShowDate] = useState(false);
 
   //contexts
   const { standings, players, club, refreshStandings, refreshResults } =
@@ -107,6 +109,11 @@ const PostResultScreen = ({ route, navigation }) => {
   const handleCourtSelect = (court) => {
     setCourtNumberInput(court);
     setCourtSurfaceInput(club.court_surface[court - 1]);
+  };
+
+  const handleDateInput = (date) => {
+    setShowDate(false);
+    setDateInput(date);
   };
 
   const isSubmitDisabled = () => {
@@ -233,8 +240,15 @@ const PostResultScreen = ({ route, navigation }) => {
             Court
           </Text>
         </View>
+
         <View style={styles.row}>
-          <DateInput dateInput={dateInput} setDateInput={setDateInput} />
+          <CustomDatePicker
+            dateInput={dateInput}
+            setDateInput={handleDateInput}
+            showDate={showDate}
+            setShowDate={setShowDate}
+          />
+
           <PlayerDropDown
             items={courtNumbers}
             value={courtNumberInput}
