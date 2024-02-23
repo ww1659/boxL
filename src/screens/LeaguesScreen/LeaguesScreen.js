@@ -8,8 +8,8 @@ import LogoInverse from "../../../assets/images/logoInverse.png";
 import LeagueCard from "../../components/LeagueCard/LeagueCard";
 
 const LeaguesScreen = ({ navigation }) => {
-  const [leagues, setLeagues] = useState([]);
   const { user } = useAuth();
+  const [leagues, setLeagues] = useState([]);
 
   useEffect(() => {
     fetchLeaguesByUserId(user.userId)

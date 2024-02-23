@@ -5,8 +5,8 @@ import Header from "../../components/Header";
 
 //screens
 import StatsScreen from "../../screens/StatsScreen/StatsScreen";
-import ResultsScreen from "../../screens/ResultsScreen";
 import LeaguesNavigator from "../LeaguesNavigator/LeaguesNavigator";
+import ResultsNavigator from "../ResultsNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -38,7 +38,7 @@ const BottomTabs = () => {
       })}
     >
       <Tab.Screen name="LeaguesScreen" component={LeaguesNavigator} />
-      <Tab.Screen name="ResultsScreen" component={ResultsScreen} />
+      <Tab.Screen name="ResultsScreen" component={ResultsNavigator} />
       <Tab.Screen name="StatsScreen" component={StatsScreen} />
     </Tab.Navigator>
   );

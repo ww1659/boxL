@@ -58,3 +58,15 @@ export const patchStandings = (result) => {
     return res.data.updatedStandings;
   });
 };
+
+export const fetchResultsByUserId = (userId) => {
+  return myApi.get(`/results/users/${userId}`).then((res) => {
+    return res.data.resultsByUserId;
+  });
+};
+
+export const getUserById = (userId) => {
+  return myApi.get(`/users/${userId}`).then((res) => {
+    return res.data.user;
+  });
+};

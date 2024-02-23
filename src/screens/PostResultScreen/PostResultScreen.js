@@ -15,11 +15,10 @@ import { checkStraightSets } from "../../utils/checkStraightSetsWin";
 import PlayerDropDown from "../../components/PlayerDropDown";
 import ScoreInput from "../../components/ScoreInput/ScoreInput";
 import CustomButton from "../../components/CustomButton";
-import DateInput from "../../components/DateInput/DateInput";
 import CustomInput from "../../components/CustomInput";
+import CustomDatePicker from "../../components/CustomDatePicker/CustomDatePicker";
 import { patchStandings, postResult } from "../../utils/api";
 import { startCase } from "lodash";
-import CustomDatePicker from "../../components/CustomDatePicker/CustomDatePicker";
 
 const sentenceCase = (name) => {
   return startCase(name.split(" "));
@@ -36,7 +35,6 @@ const PostResultScreen = ({ route, navigation }) => {
   const [thirdSetInput, setThirdSetInput] = useState("");
   const [isChecked, setChecked] = useState(false);
   const [courtNumberInput, setCourtNumberInput] = useState("");
-  const [courtSurfaceInput, setCourtSurfaceInput] = useState("");
   const [dateInput, setDateInput] = useState(
     new Date().toISOString().slice(0, 10)
   );
@@ -46,11 +44,15 @@ const PostResultScreen = ({ route, navigation }) => {
   const [firstSetScoreError, setFirstSetScoreError] = useState(false);
   const [secondSetScoreError, setSecondSetScoreError] = useState(false);
   const [thirdSetScoreError, setThirdSetScoreError] = useState(false);
+  const [straightSetsError, setStraightSetsError] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
 
   // logic states
   const [thirdSetRequired, setThirdSetRequired] = useState(false);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [showDate, setShowDate] = useState(false);
+  const [firstSetLoss, setFirstSetLoss] = useState(false);
+  const [secondSetLoss, setSecondSetLoss] = useState(false);
 
   //contexts
   const { standings, players, club, refreshStandings, refreshResults } =
@@ -67,24 +69,49 @@ const PostResultScreen = ({ route, navigation }) => {
   };
 
   //function to generate array of player names
-  let playerNames = [];
-  if (isUserAdmin) {
-    playerNames = players.map((player) => ({
-      label: sentenceCase(player.name),
-      value: player.name,
-    }));
-  } else {
-    playerNames = availablePlayers.map((player) => ({
-      label: sentenceCase(player.name),
-      value: player.name,
-    }));
-  }
+  generatePlayerNames = (players) => {
+    let playerNames = [];
+    if (isUserAdmin) {
+      playerNames = players.map((player) => ({
+        label: sentenceCase(player.name),
+        value: player.name,
+      }));
+    } else {
+      playerNames = availablePlayers.map((player) => ({
+        label: sentenceCase(player.name),
+        value: player.name,
+      }));
+    }
+    for (const player of playerNames) {
+      const matchingStanding = standings.find(
+        (standing) =>
+          standing.player_name.toLowerCase() === player.value.toLowerCase()
+      );
+      if (matchingStanding) {
+        player.parent = matchingStanding.group_name;
+      }
+    }
+    const uniqueGroups = Array.from(
+      new Set(standings.map((item) => item.group_name))
+    );
+    uniqueGroups.forEach((group) => {
+      playerNames.push({ label: `GROUP ${group}`, value: group });
+    });
+    return playerNames;
+  };
 
   //function to generate array of court numbers
-  const courtNumbers = [];
-  for (let i = 1; i <= club.number_of_courts; i++) {
-    courtNumbers.push({ label: i, value: i });
-  }
+  generateCourtNumbers = (club) => {
+    const courtNumbers = [{ label: `${club.name} Courts`, value: club.name }];
+    for (let i = 1; i <= club.number_of_courts; i++) {
+      courtNumbers.push({
+        label: `Court ${i}: ${sentenceCase(club.court_surface[i - 1])}`,
+        value: i,
+        parent: club.name,
+      });
+    }
+    return courtNumbers;
+  };
 
   useEffect(() => {
     if (
@@ -108,7 +135,6 @@ const PostResultScreen = ({ route, navigation }) => {
 
   const handleCourtSelect = (court) => {
     setCourtNumberInput(court);
-    setCourtSurfaceInput(club.court_surface[court - 1]);
   };
 
   const handleDateInput = (date) => {
@@ -122,11 +148,11 @@ const PostResultScreen = ({ route, navigation }) => {
       !loserInput ||
       !dateInput ||
       !courtNumberInput ||
-      !courtSurfaceInput ||
       !firstSetInput ||
       firstSetScoreError ||
       !secondSetInput ||
       secondSetScoreError ||
+      straightSetsError ||
       (thirdSetRequired && !thirdSetInput) ||
       thirdSetScoreError
     ) {
@@ -145,7 +171,6 @@ const PostResultScreen = ({ route, navigation }) => {
       !loserInput ||
       !dateInput ||
       !courtNumberInput ||
-      !courtSurfaceInput ||
       !firstSetInput ||
       !secondSetInput ||
       (thirdSetRequired && !thirdSetInput)
@@ -160,6 +185,7 @@ const PostResultScreen = ({ route, navigation }) => {
     const winnerId = winner.user_id;
     const loserId = loser.user_id;
     const leagueId = standings[0].league_id;
+    const courtSurface = club.court_surface[courtNumberInput - 1] || "";
 
     const result = {
       league_id: leagueId,
@@ -178,7 +204,7 @@ const PostResultScreen = ({ route, navigation }) => {
       match_date: dateInput,
       club_id: club.club_id,
       court_number: courtNumberInput,
-      court_surface: courtSurfaceInput,
+      court_surface: courtSurface,
       match_notes: matchNotesInput,
     };
 
@@ -190,9 +216,19 @@ const PostResultScreen = ({ route, navigation }) => {
       setIsSubmitLoading(false);
       navigation.navigate("IndividualLeague");
     } catch (err) {
+      setSubmitError(true);
       throw err;
     }
   };
+
+  if (submitError)
+    return (
+      <SafeAreaView style={styles.loading}>
+        <View>
+          <Text style={styles.loadingText}>Server Error.... SORRY</Text>
+        </View>
+      </SafeAreaView>
+    );
 
   if (isSubmitLoading)
     return (
@@ -205,132 +241,153 @@ const PostResultScreen = ({ route, navigation }) => {
     );
 
   return (
-    <SafeAreaView>
-      <View style={styles.root}>
-        <Text variant="displaySmall" style={styles.header}>
-          Add New Result
-        </Text>
-        <View style={styles.row}>
-          <Text variant="bodyLarge" style={styles.scoreHeader}>
-            WINNER
+    <ScrollView>
+      <SafeAreaView>
+        <View style={styles.root}>
+          <Text variant="displaySmall" style={styles.header}>
+            Add New Result
           </Text>
-          <Text variant="bodyLarge" style={styles.scoreHeader}>
-            LOSER
-          </Text>
-        </View>
-        <View style={styles.row}>
-          <PlayerDropDown
-            items={playerNames}
-            value={winnerInput}
-            setValue={handleWinnerSelect}
-            label={"Select a player"}
-          />
-          <PlayerDropDown
-            items={playerNames}
-            value={loserInput}
-            setValue={handleLoserSelect}
-            label={"Select a player"}
-          />
-        </View>
-        <View style={styles.row}>
-          <Text variant="bodyLarge" style={styles.scoreHeader}>
-            Date
-          </Text>
-          <Text variant="bodyLarge" style={styles.scoreHeader}>
-            Court
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text variant="bodyLarge" style={styles.scoreHeader}>
+              WINNER
+            </Text>
+            <Text variant="bodyLarge" style={styles.scoreHeader}>
+              LOSER
+            </Text>
+          </View>
+          <View style={[styles.row, styles.dropDown1]}>
+            <PlayerDropDown
+              items={generatePlayerNames(players)}
+              value={winnerInput}
+              setValue={handleWinnerSelect}
+              label={"Select a player"}
+              oppositionInput={loserInput}
+            />
+            <PlayerDropDown
+              items={generatePlayerNames(players)}
+              value={loserInput}
+              setValue={handleLoserSelect}
+              label={"Select a player"}
+              oppositionInput={winnerInput}
+            />
+          </View>
+          <View style={styles.row}>
+            <Text variant="bodyLarge" style={styles.scoreHeader}>
+              Date
+            </Text>
+            <Text variant="bodyLarge" style={styles.scoreHeader}>
+              Court
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <CustomDatePicker
-            dateInput={dateInput}
-            setDateInput={handleDateInput}
-            showDate={showDate}
-            setShowDate={setShowDate}
-          />
+          <View style={[styles.row, styles.dropDown2]}>
+            <CustomDatePicker
+              dateInput={dateInput}
+              setDateInput={handleDateInput}
+              showDate={showDate}
+              setShowDate={setShowDate}
+            />
 
-          <PlayerDropDown
-            items={courtNumbers}
-            value={courtNumberInput}
-            setValue={handleCourtSelect}
-            label={"Select a court"}
-          />
-        </View>
-        <View style={styles.row}>
-          <Text variant="bodyLarge" style={styles.scoreHeader}>
-            First Set Score
-          </Text>
-          <Text variant="bodyLarge" style={styles.scoreHeader}>
-            Second Set Score
-          </Text>
-        </View>
-        <View style={styles.row}>
-          <ScoreInput
-            placeholder="e.g. 6-3"
-            value={firstSetInput}
-            setValue={setFirstSetInput}
-            error={firstSetScoreError}
-            setError={setFirstSetScoreError}
-            maxChars={3}
-          />
-          <ScoreInput
-            placeholder="e.g. 7-6"
-            value={secondSetInput}
-            setValue={setSecondSetInput}
-            error={secondSetScoreError}
-            setError={setSecondSetScoreError}
-            maxChars={3}
-          />
-        </View>
-        {thirdSetRequired ? (
-          <>
+            <PlayerDropDown
+              items={generateCourtNumbers(club)}
+              value={courtNumberInput}
+              setValue={handleCourtSelect}
+              label={"Select a Court"}
+              isCourt={true}
+            />
+          </View>
+          <View style={styles.row}>
+            <Text variant="bodyLarge" style={styles.scoreHeader}>
+              First Set Score
+            </Text>
+            <Text variant="bodyLarge" style={styles.scoreHeader}>
+              Second Set Score
+            </Text>
+          </View>
+          <View style={styles.row}>
+            <ScoreInput
+              placeholder="e.g. 6-3"
+              value={firstSetInput}
+              setValue={setFirstSetInput}
+              error={firstSetScoreError}
+              setError={setFirstSetScoreError}
+              maxChars={3}
+              setLoss={setFirstSetLoss}
+              otherSetLoss={secondSetLoss}
+              straightSetsError={straightSetsError}
+              setStraightSetsError={setStraightSetsError}
+            />
+            <ScoreInput
+              placeholder="e.g. 7-6"
+              value={secondSetInput}
+              setValue={setSecondSetInput}
+              error={secondSetScoreError}
+              setError={setSecondSetScoreError}
+              maxChars={3}
+              setLoss={setSecondSetLoss}
+              otherSetLoss={firstSetLoss}
+              straightSetsError={straightSetsError}
+              setStraightSetsError={setStraightSetsError}
+            />
+          </View>
+          {straightSetsError ? (
             <View style={styles.row}>
-              <Text variant="bodyLarge" style={styles.checkboxHeader}>
-                Champs Tiebreak:
+              <Text variant="bodyLarge" style={styles.straightSetsError}>
+                This score indicates a win for the loser. Please enter a valid
+                scoreline!
               </Text>
-              <View style={styles.checkbox}>
-                <Checkbox
-                  status={isChecked ? "checked" : "unchecked"}
-                  onPress={() => {
-                    setChecked(!isChecked);
-                  }}
+            </View>
+          ) : null}
+          {thirdSetRequired ? (
+            <>
+              <View style={styles.row}>
+                <Text variant="bodyLarge" style={styles.checkboxHeader}>
+                  Champs Tiebreak:
+                </Text>
+                <View style={styles.checkbox}>
+                  <Checkbox
+                    status={isChecked ? "checked" : "unchecked"}
+                    onPress={() => {
+                      setChecked(!isChecked);
+                    }}
+                  />
+                </View>
+              </View>
+              <View style={styles.row}>
+                <Text variant="bodyLarge" style={styles.scoreHeader}>
+                  Third Set Score:
+                </Text>
+                <ScoreInput
+                  placeholder={isChecked ? "e.g. 10-5" : "e.g. 7-5"}
+                  value={thirdSetInput}
+                  setValue={setThirdSetInput}
+                  error={thirdSetScoreError}
+                  setError={setThirdSetScoreError}
+                  thirdSet={thirdSetRequired}
+                  maxChars={isChecked ? 5 : 3}
+                  isTiebreak={isChecked ? true : false}
                 />
               </View>
-            </View>
-            <View style={styles.row}>
-              <Text variant="bodyLarge" style={styles.scoreHeader}>
-                Third Set Score
-              </Text>
-              <ScoreInput
-                placeholder={isChecked ? "e.g. 10-5" : "e.g. 7-5"}
-                value={thirdSetInput}
-                setValue={setThirdSetInput}
-                error={thirdSetScoreError}
-                setError={setThirdSetScoreError}
-                thirdSet={thirdSetRequired}
-                maxChars={isChecked ? 5 : 3}
-                isTiebreak={isChecked ? true : false}
-              />
-            </View>
-          </>
-        ) : null}
-        <View style={styles.matchReport}>
-          <CustomInput
-            placeholder="Optional: Write match report here..."
-            value={matchNotesInput}
-            setValue={setMatchNotesInput}
-            formIcon="notes"
-            secureTextEntry={false}
+            </>
+          ) : null}
+          <View style={styles.matchReport}>
+            <CustomInput
+              placeholder="Optional: Write match report here..."
+              value={matchNotesInput}
+              setValue={setMatchNotesInput}
+              formIcon="notes"
+              secureTextEntry={false}
+            />
+          </View>
+
+          <CustomButton
+            text="Submit Result"
+            onPress={onSumbitPress}
+            disabled={isSubmitDisabled()}
           />
         </View>
-
-        <CustomButton
-          text="Submit Result"
-          onPress={onSumbitPress}
-          disabled={isSubmitDisabled()}
-        />
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </ScrollView>
   );
 };
 
@@ -372,6 +429,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  straightSetsError: {
+    flex: 1,
+    paddingHorizontal: 10,
+    marginHorizontal: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#D90429",
+  },
   matchReport: {
     margin: 10,
   },
@@ -385,6 +450,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "#2B2D42",
   },
+  // dropDown1: {
+  //   zIndex: 999,
+  // },
+  // dropDown2: {
+  //   zIndex: 998,
+  // },
 });
 
 export default PostResultScreen;

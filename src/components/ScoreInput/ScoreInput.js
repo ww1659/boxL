@@ -13,12 +13,24 @@ const ScoreInput = ({
   setError,
   thirdSet,
   maxChars,
+  setLoss,
+  otherSetLoss,
   isTiebreak,
+  straightSetsError,
+  setStraightSetsError,
 }) => {
   const [showIcon, setShowIcon] = useState(false);
 
   const validate = (event) => {
     const score = event.nativeEvent.text;
+    if (otherSetLoss === true) {
+      if (score.split("-")[1] > score.split("-")[0]) {
+        setStraightSetsError(true);
+      } else {
+        setStraightSetsError(false);
+      }
+    }
+
     setShowIcon(true);
     let isValid;
     if (isTiebreak) {
@@ -28,12 +40,26 @@ const ScoreInput = ({
     } else {
       isValid = validateScore(score);
     }
+
+    if (isValid && !thirdSet) {
+      if (score.split("-")[1] > score.split("-")[0]) {
+        setLoss(true);
+      } else {
+        setLoss(false);
+      }
+    }
+
     setError(!isValid);
   };
 
   return (
     <View style={styles.container}>
-      <View style={[styles.scoreInput, error && styles.error]}>
+      <View
+        style={[
+          styles.scoreInput,
+          (straightSetsError || error) && styles.error,
+        ]}
+      >
         <TextInput
           style={styles.text}
           value={value}
