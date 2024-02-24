@@ -76,5 +76,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  leagueCard: { paddingBottom: 10 },
+  leagueCard: { paddingBottom: 10, marginVertical: 5 },
 });

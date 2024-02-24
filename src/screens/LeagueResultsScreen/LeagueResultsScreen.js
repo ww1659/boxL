@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, ScrollView, StyleSheet } from "react-native";
-import { ActivityIndicator, Divider, Text } from "react-native-paper";
-import { startCase } from "lodash";
+import { View, ScrollView, StyleSheet } from "react-native";
+import { ActivityIndicator, Text } from "react-native-paper";
 import { formatDateShort } from "../../utils/formatDate";
-
-const getFirstName = (name) => {
-  return startCase(name.split(" ")[0]);
-};
+import ResultCard from "../../components/ResultCard/ResultCard";
+import { useAuth } from "../../contexts/AuthContext";
 
 const LeagueResultsScreen = ({ route }) => {
   const { results, loading } = route.params;
+  const { user } = useAuth();
 
   const resultsByDate = results.reduce((acc, result) => {
     const date = formatDateShort(result.match_date);
@@ -23,42 +21,34 @@ const LeagueResultsScreen = ({ route }) => {
   return (
     <ScrollView>
       <View style={styles.root}>
+        <Text variant="displaySmall" style={styles.header}>
+          League Results
+        </Text>
         {loading ? (
           <ActivityIndicator animating={true} />
         ) : (
           <View>
             {Object.entries(resultsByDate).map(([date, results]) => (
               <View key={date}>
-                <Text style={styles.dateHeader}>{date}</Text>
-                <View style={styles.headerRow}>
-                  <Text style={[styles.headerText, styles.winner]}>Winner</Text>
-                  <Text style={[styles.headerText, styles.loser]}>Loser</Text>
-                  <Text style={[styles.headerText, styles.score]}>Set 1</Text>
-                  <Text style={[styles.headerText, styles.score]}>Set 2</Text>
-                  <Text style={[styles.headerText, styles.score]}>Set 3</Text>
-                </View>
-                {results.map((item, index) => (
+                <Text variant="titleLarge" style={styles.dateHeader}>
+                  {date}
+                </Text>
+                {results.map((item) => (
                   <View key={item.result_id}>
-                    <View style={styles.matchCard}>
-                      <View style={styles.matchInfo}>
-                        <Text style={[styles.text, styles.winner]}>
-                          {getFirstName(item.winner_name)}
-                        </Text>
-                        <Text style={[styles.text, styles.loser]}>
-                          {getFirstName(item.loser_name)}
-                        </Text>
-                        <Text style={[styles.text, styles.score]}>
-                          {item.first_set_score}
-                        </Text>
-                        <Text style={[styles.text, styles.score]}>
-                          {item.second_set_score}
-                        </Text>
-                        <Text style={[styles.text, styles.score]}>
-                          {item.third_set_score}
-                        </Text>
-                      </View>
-                    </View>
-                    <Divider />
+                    <ResultCard
+                      user={user}
+                      winnerId={item.winner_id}
+                      loserId={item.loser_id}
+                      firstSet={item.first_set_score}
+                      secondSet={item.second_set_score}
+                      thirdSet={item.third_set_score}
+                      isChampionshipTiebreak={item.championship_tiebreak}
+                      championshipTiebreakScore={
+                        item.championship_tiebreak_score
+                      }
+                      date={item.match_date}
+                      leagueResult={true}
+                    />
                   </View>
                 ))}
               </View>
@@ -74,41 +64,12 @@ const styles = StyleSheet.create({
   root: {
     paddingHorizontal: 20,
   },
-  dateHeader: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginVertical: 10,
+  header: {
+    textAlign: "left",
+    color: "#2B2D42",
+    paddingVertical: 10,
   },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 5,
-  },
-  headerText: {
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  matchCard: {
-    marginVertical: 10,
-    paddingVertical: 2,
-    borderRadius: 5,
-  },
-  matchInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  text: {
-    fontSize: 16,
-  },
-  winner: {
-    width: "20%",
-  },
-  loser: {
-    width: "20%",
-  },
-  score: {
-    width: "20%",
-  },
+  dateHeader: { marginTop: 30 },
 });
 
 export default LeagueResultsScreen;

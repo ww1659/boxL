@@ -32,8 +32,6 @@ const LeagueCard = ({
   const [clubImage, setClubImage] = useState("");
   const [loading, setLoading] = useState(true);
 
-  console.log(adminId, userId);
-
   let isAdmin = false;
   if (adminId === userId) isAdmin = true;
 

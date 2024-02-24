@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, FlatList } from "react-native";
-import { ActivityIndicator, Text } from "react-native-paper";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { ActivityIndicator, Button, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { startCase } from "lodash";
 import { useLeagueData } from "../../contexts/LeagueDataContext";
@@ -29,6 +29,13 @@ const IndividualLeagueScreen = ({ navigation }) => {
   const uniqueGroups = Array.from(
     new Set(standings.map((item) => item.group_name))
   );
+
+  const initialState = {};
+  uniqueGroups.forEach((group) => {
+    initialState[`expandGroupTable${group}`] = false;
+  });
+  const [expandGroupTables, setExpandGroupTables] = useState(initialState);
+
   const sortedStandings = sortStandings(standings, results);
 
   const handlePlayersPress = () => {
@@ -41,6 +48,14 @@ const IndividualLeagueScreen = ({ navigation }) => {
 
   const handlePostResultPress = () => {
     navigation.navigate("PostResultScreen", { isUserAdmin });
+  };
+
+  const handleExpandPress = (group) => {
+    const key = `expandGroupTable${group}`;
+    setExpandGroupTables((prevState) => ({
+      ...prevState,
+      [key]: !prevState[key],
+    }));
   };
 
   return (
@@ -80,11 +95,12 @@ const IndividualLeagueScreen = ({ navigation }) => {
                 onPress={() => handlePostResultPress()}
               />
             </View>
-            <View style={styles.buttonsRow}></View>
             {uniqueGroups.map((groupName) => (
               <View key={groupName} style={styles.groupContainer}>
                 <Text style={styles.groupTitle}>Group {groupName}</Text>
-                <StandingsHeader />
+                <StandingsHeader
+                  expanded={expandGroupTables[`expandGroupTable${groupName}`]}
+                />
                 {sortedStandings
                   .filter((item) => item.group_name === groupName)
                   .map((item) => (
@@ -95,8 +111,31 @@ const IndividualLeagueScreen = ({ navigation }) => {
                       player={getFirstName(item.player_name)}
                       matchesPlayed={item.matches_played}
                       wins={item.wins}
+                      setsWon={item.sets_won}
+                      setsLost={item.sets_lost}
+                      gamesWon={item.games_won}
+                      gamesLost={item.games_lost}
+                      expanded={
+                        expandGroupTables[`expandGroupTable${groupName}`]
+                      }
                     />
                   ))}
+                <View style={styles.expandButtonRow}>
+                  <Button
+                    textColor="#2B2D42"
+                    // mode="outlined"
+                    icon={
+                      expandGroupTables[`expandGroupTable${groupName}`]
+                        ? "arrow-collapse"
+                        : "arrow-expand"
+                    }
+                    onPress={() => handleExpandPress(groupName)}
+                  >
+                    {expandGroupTables[`expandGroupTable${groupName}`]
+                      ? "Basic View"
+                      : "Detailed View"}{" "}
+                  </Button>
+                </View>
               </View>
             ))}
           </View>
@@ -130,8 +169,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginVertical: 10,
   },
+  expandButtonRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "flex-start",
+    marginTop: 10,
+  },
   groupContainer: {
-    marginBottom: 30,
+    marginVertical: 20,
   },
   groupTitle: {
     fontSize: 24,

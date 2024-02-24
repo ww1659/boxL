@@ -39,6 +39,8 @@ const PostResultScreen = ({ route, navigation }) => {
     new Date().toISOString().slice(0, 10)
   );
   const [matchNotesInput, setMatchNotesInput] = useState("");
+  const [groupWinnerInput, setGroupWinnerInput] = useState("");
+  const [groupLoserInput, setGroupLoserInput] = useState("");
 
   //error states
   const [firstSetScoreError, setFirstSetScoreError] = useState(false);
@@ -129,9 +131,31 @@ const PostResultScreen = ({ route, navigation }) => {
     setWinnerInput(player);
   };
 
+  useEffect(() => {
+    if (winnerInput !== "") {
+      const groupWinner = standings.find(
+        (item) => item.player_name === winnerInput
+      ).group_name;
+      if (groupWinner) {
+        setGroupWinnerInput(groupWinner);
+      }
+    }
+  }, [winnerInput]);
+
   const handleLoserSelect = (player) => {
     setLoserInput(player);
   };
+
+  useEffect(() => {
+    if (loserInput !== "") {
+      const groupLoser = standings.find(
+        (item) => item.player_name === loserInput
+      ).group_name;
+      if (groupLoser) {
+        setGroupLoserInput(groupLoser);
+      }
+    }
+  }, [loserInput]);
 
   const handleCourtSelect = (court) => {
     setCourtNumberInput(court);
@@ -153,6 +177,7 @@ const PostResultScreen = ({ route, navigation }) => {
       !secondSetInput ||
       secondSetScoreError ||
       straightSetsError ||
+      groupWinnerInput !== groupLoserInput ||
       (thirdSetRequired && !thirdSetInput) ||
       thirdSetScoreError
     ) {
@@ -186,12 +211,13 @@ const PostResultScreen = ({ route, navigation }) => {
     const loserId = loser.user_id;
     const leagueId = standings[0].league_id;
     const courtSurface = club.court_surface[courtNumberInput - 1] || "";
+    const groupName = groupWinnerInput;
 
     const result = {
       league_id: leagueId,
       winner_id: winnerId,
       loser_id: loserId,
-      group_name: "A",
+      group_name: groupName,
       first_set_score: firstSetInput,
       first_set_tiebreak: "",
       second_set_score: secondSetInput,

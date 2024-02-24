@@ -18,6 +18,7 @@ const ResultCard = ({
   isChampionshipTiebreak,
   championshipTiebreakScore,
   date,
+  leagueResult,
 }) => {
   const [loading, setLoading] = useState(true);
   const [winnerName, setWinnerName] = useState("");
@@ -26,15 +27,10 @@ const ResultCard = ({
   useEffect(() => {
     const fetchWinnerAndLoserNames = async () => {
       try {
-        if (winnerId === user.userId) {
-          setWinnerName(user.name);
-          const loser = await getUserById(loserId);
-          setLoserName(loser[0].name);
-        } else {
-          setLoserName(user.name);
-          const winner = await getUserById(winnerId);
-          setWinnerName(winner[0].name);
-        }
+        const winner = await getUserById(winnerId);
+        const loser = await getUserById(loserId);
+        setWinnerName(winner[0].name);
+        setLoserName(loser[0].name);
       } catch (error) {
         console.log(error);
       } finally {
@@ -43,14 +39,14 @@ const ResultCard = ({
     };
 
     fetchWinnerAndLoserNames();
-  }, [user.userId, user.name, winnerId, loserId]);
+  }, [winnerId, loserId]);
 
   const formattedDate = new Date(date).toISOString().split("T")[0];
   const winnerFirstSet = firstSet.split("-")[0];
   const loserFirstSet = firstSet.split("-")[1];
   const winnerSecondSet = secondSet.split("-")[0];
   const loserSecondSet = secondSet.split("-")[1];
-  let userWin = false;
+  let userWin;
   if (winnerId === user.userId) {
     userWin = true;
   }
@@ -96,7 +92,16 @@ const ResultCard = ({
 
   return (
     <Pressable onPress={onPress}>
-      <View style={[styles.container, userWin ? styles.containerWin : null]}>
+      <View
+        style={[
+          styles.container,
+          userWin === undefined
+            ? null
+            : userWin
+            ? styles.containerWin
+            : styles.containerLoss,
+        ]}
+      >
         <View style={styles.row}>
           <Text variant="labelLarge" style={styles.name}>
             {formattedDate}
@@ -112,7 +117,12 @@ const ResultCard = ({
           </Text>
         </View>
         <View style={styles.row}>
-          <Text variant="bodyLarge" style={[styles.name, styles.win]}>
+          <Text
+            variant="bodyLarge"
+            style={[styles.name, styles.win]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {sentenceCase(winnerName)}
           </Text>
           <Text
@@ -135,7 +145,12 @@ const ResultCard = ({
           </Text>
         </View>
         <View style={styles.row}>
-          <Text variant="bodyLarge" style={styles.name}>
+          <Text
+            variant="bodyLarge"
+            style={styles.name}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {sentenceCase(loserName)}
           </Text>
           <Text
@@ -163,7 +178,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     width: "100%",
-    borderColor: "red",
+    borderColor: "#2B2D42",
     borderWidth: 2,
     borderRadius: 5,
     padding: 10,
@@ -171,6 +186,9 @@ const styles = StyleSheet.create({
   },
   containerWin: {
     borderColor: "green",
+  },
+  containerLoss: {
+    borderColor: "red",
   },
   row: {
     flexDirection: "row",
