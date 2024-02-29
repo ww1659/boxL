@@ -1,13 +1,34 @@
 import axios from "axios";
+import * as SecureStore from "expo-secure-store";
+
+const getToken = async (key) => {
+  try {
+    const result = await SecureStore.getItemAsync(key);
+    if (result) {
+      return result;
+    }
+  } catch (error) {
+    console.error("error fetching token:", error);
+  }
+};
 
 const myApi = axios.create({
   baseURL: "https://boxl-api.onrender.com/api",
 });
 
-export const fetchLeaguesByUserId = (userId) => {
-  return myApi.get(`/leagues/users/${userId}`).then((res) => {
+export const fetchLeaguesByUserId = async (userId) => {
+  try {
+    const accessToken = await getToken("accessToken");
+    const res = await myApi.get(`/leagues/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     return res.data.leaguesByUserId;
-  });
+  } catch (error) {
+    console.error("error fetching leagues:", error);
+    throw error;
+  }
 };
 
 export const fetchLeagueByLeagueId = (leagueId) => {

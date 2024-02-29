@@ -10,11 +10,11 @@ import {
   ScrollView,
   useWindowDimensions,
 } from "react-native";
-import { ProgressBar } from "react-native-paper";
 import Logo from "../../../assets/images/logo.png";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import SocialSignInButtons from "../../components/SocialSignInButtons";
+import { StackActions } from "@react-navigation/native";
 
 const SignInScreen = ({ navigation }) => {
   const { login } = useAuth();
@@ -41,9 +41,9 @@ const SignInScreen = ({ navigation }) => {
     try {
       const formattedUsername = username.trim().toLowerCase();
       const response = await login({ formattedUsername, password });
-      if (response.status === true) {
+      if (response.status === "success") {
+        navigation.dispatch(StackActions.replace("BottomTabs"));
         setLoginLoading(false);
-        navigation.navigate("BottomTabs");
       }
     } catch (error) {
       setLoginLoading(false);

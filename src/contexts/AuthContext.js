@@ -1,5 +1,6 @@
 import { createContext, useState, useContext } from "react";
 import { loginUser } from "../utils/api";
+import * as SecureStore from "expo-secure-store";
 
 export const AuthContext = createContext();
 
@@ -11,7 +12,13 @@ export const AuthProvider = ({ children }) => {
     email: "",
     avatar_url: "",
     club: "",
+    exp: 0,
+    iat: 0,
   });
+
+  const storeToken = async (token) => {
+    await SecureStore.setItemAsync("accessToken", token);
+  };
 
   const login = async (userInput) => {
     try {
@@ -20,8 +27,10 @@ export const AuthProvider = ({ children }) => {
         password: userInput.password,
       };
       const response = await loginUser(user);
-      if (response.status === true) {
-        const user = response.user;
+      if (response.status === "success") {
+        storeToken(response.token);
+
+        const user = response.data;
         setUser({
           userId: user.user_id,
           username: user.username,
@@ -29,6 +38,8 @@ export const AuthProvider = ({ children }) => {
           email: user.email,
           avatar_url: user.avatar_url,
           club: user.club,
+          exp: user.exp,
+          iat: user.iat,
         });
       }
       return response;

@@ -6,6 +6,7 @@ import { fetchLeaguesByUserId } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
 import LogoInverse from "../../../assets/images/logoInverse.png";
 import LeagueCard from "../../components/LeagueCard/LeagueCard";
+import * as SecureStore from "expo-secure-store";
 
 const LeaguesScreen = ({ navigation }) => {
   const { user } = useAuth();
