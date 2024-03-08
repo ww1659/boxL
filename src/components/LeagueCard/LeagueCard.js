@@ -52,28 +52,24 @@ const LeagueCard = ({
   return (
     <TouchableOpacity onPress={onPress}>
       <Card>
-        {loading ? (
-          <ActivityIndicator animating={true} />
-        ) : (
-          <>
-            <Card.Title
-              title={leagueName}
-              subtitle={clubName}
-              left={LeftContent}
-            />
-            <Card.Content>
-              <Text variant="bodyMedium">
-                End Date: {formatDateLong(endDate)}
-              </Text>
-              <Text variant="bodyMedium">Format: {changeFormat(format)}</Text>
-            </Card.Content>
-            {/* {isAdmin ? (
+        <>
+          <Card.Title
+            title={leagueName}
+            subtitle={clubName}
+            left={LeftContent}
+          />
+          <Card.Content>
+            <Text variant="bodyMedium">
+              End Date: {formatDateLong(endDate)}
+            </Text>
+            <Text variant="bodyMedium">Format: {changeFormat(format)}</Text>
+          </Card.Content>
+          {/* {isAdmin ? (
               <Card.Actions>
                 <Button>Add Player to League</Button>
               </Card.Actions>
             ) : null} */}
-          </>
-        )}
+        </>
       </Card>
     </TouchableOpacity>
   );

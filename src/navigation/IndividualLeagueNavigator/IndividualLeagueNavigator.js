@@ -10,7 +10,7 @@ import { LeagueDataProvider } from "../../contexts/LeagueDataContext";
 
 const Stack = createNativeStackNavigator();
 
-const IndividualLeagueNavigator = ({ route }) => {
+const IndividualLeagueNavigator = ({ route, navigation }) => {
   const { leagueId } = route.params;
 
   return (
@@ -22,7 +22,9 @@ const IndividualLeagueNavigator = ({ route }) => {
           initialParams={{ leagueId }}
           options={{
             headerTitleAlign: "center",
-            headerTitle: () => <Header />,
+            headerTitle: (props) => (
+              <Header {...props} navigation={navigation} />
+            ),
           }}
         ></Stack.Screen>
         <Stack.Screen
@@ -31,7 +33,9 @@ const IndividualLeagueNavigator = ({ route }) => {
           initialParams={{ leagueId }}
           options={{
             headerTitleAlign: "center",
-            headerTitle: () => <Header />,
+            headerTitle: (props) => (
+              <Header {...props} navigation={navigation} />
+            ),
           }}
         ></Stack.Screen>
         <Stack.Screen
@@ -40,7 +44,9 @@ const IndividualLeagueNavigator = ({ route }) => {
           initialParams={{ leagueId }}
           options={{
             headerTitleAlign: "center",
-            headerTitle: () => <Header />,
+            headerTitle: (props) => (
+              <Header {...props} navigation={navigation} />
+            ),
           }}
         ></Stack.Screen>
         <Stack.Screen
@@ -49,7 +55,9 @@ const IndividualLeagueNavigator = ({ route }) => {
           initialParams={{ leagueId }}
           options={{
             headerTitleAlign: "center",
-            headerTitle: () => <Header />,
+            headerTitle: (props) => (
+              <Header {...props} navigation={navigation} />
+            ),
           }}
         ></Stack.Screen>
       </Stack.Navigator>

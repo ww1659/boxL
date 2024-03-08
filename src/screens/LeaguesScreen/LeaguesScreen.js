@@ -6,19 +6,22 @@ import { fetchLeaguesByUserId } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
 import LogoInverse from "../../../assets/images/logoInverse.png";
 import LeagueCard from "../../components/LeagueCard/LeagueCard";
-import * as SecureStore from "expo-secure-store";
+import { ActivityIndicator } from "react-native-paper";
 
 const LeaguesScreen = ({ navigation }) => {
   const { user } = useAuth();
   const [leagues, setLeagues] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchLeaguesByUserId(user.userId)
+    fetchLeaguesByUserId(user.userId, user.exp)
       .then((leagues) => {
         setLeagues(leagues);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
+        setLoading(false);
       });
   }, []);
 
@@ -35,21 +38,27 @@ const LeaguesScreen = ({ navigation }) => {
           {/* <Image source={LogoInverse} style={[styles.logo]} resizeMode="contain" /> */}
           <Text style={styles.header}>Welcome, {firstName}</Text>
           <Text style={[styles.header, styles.leagueHeader]}>Your Leagues</Text>
-          {leagues.map((league) => (
-            <View style={styles.leagueCard} key={league.league_id}>
-              <LeagueCard
-                leagueId={league.league_id}
-                leagueName={league.name}
-                clubId={league.club_id}
-                startDate={league.start_date}
-                endDate={league.end_date}
-                format={league.format}
-                adminId={league.admin}
-                userId={user.userId}
-                onPress={() => navigateToIndividualLeague(league.league_id)}
-              />
-            </View>
-          ))}
+          {loading ? (
+            <ActivityIndicator animating={true} />
+          ) : (
+            <>
+              {leagues.map((league) => (
+                <View style={styles.leagueCard} key={league.league_id}>
+                  <LeagueCard
+                    leagueId={league.league_id}
+                    leagueName={league.name}
+                    clubId={league.club_id}
+                    startDate={league.start_date}
+                    endDate={league.end_date}
+                    format={league.format}
+                    adminId={league.admin}
+                    userId={user.userId}
+                    onPress={() => navigateToIndividualLeague(league.league_id)}
+                  />
+                </View>
+              ))}
+            </>
+          )}
         </View>
       </SafeAreaView>
     </ScrollView>

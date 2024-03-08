@@ -7,7 +7,7 @@ import IndividualLeagueNavigator from "../IndividualLeagueNavigator/IndividualLe
 
 const Stack = createNativeStackNavigator();
 
-const LeaguesNavigator = () => {
+const LeaguesNavigator = ({ navigation }) => {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -15,7 +15,7 @@ const LeaguesNavigator = () => {
         component={LeaguesScreen}
         options={{
           headerTitleAlign: "center",
-          headerTitle: () => <Header />,
+          headerTitle: (props) => <Header {...props} navigation={navigation} />,
           headerLeft: () => null,
         }}
       ></Stack.Screen>

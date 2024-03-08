@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }) => {
       const response = await loginUser(user);
       if (response.status === "success") {
         storeToken(response.token);
-
         const user = response.data;
         setUser({
           userId: user.user_id,
@@ -37,7 +36,7 @@ export const AuthProvider = ({ children }) => {
           name: user.name,
           email: user.email,
           avatar_url: user.avatar_url,
-          club: user.club,
+          club: user.club_id,
           exp: user.exp,
           iat: user.iat,
         });
@@ -48,15 +47,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    setUser({
-      userId: "",
-      username: "",
-      name: "",
-      email: "",
-      avatar_url: "",
-      club: "",
-    });
+  const logout = async () => {
+    try {
+      await SecureStore.deleteItemAsync("accessToken");
+      setUser({
+        userId: "",
+        username: "",
+        name: "",
+        email: "",
+        avatar_url: "",
+        club: "",
+      });
+    } catch (error) {
+      console.error("error logging out:", error);
+    }
   };
 
   return (

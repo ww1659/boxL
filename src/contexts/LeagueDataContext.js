@@ -6,10 +6,12 @@ import {
   fetchStandingsByLeagueId,
   fetchUsersByLeagueId,
 } from "../utils/api";
+import { useAuth } from "./AuthContext";
 
 export const LeagueDataContext = createContext();
 
 export const LeagueDataProvider = ({ leagueId, children }) => {
+  const { user } = useAuth();
   const [league, setLeague] = useState({});
   const [standings, setStandings] = useState([]);
   const [results, setResults] = useState([]);
@@ -21,10 +23,10 @@ export const LeagueDataProvider = ({ leagueId, children }) => {
     const fetchData = async () => {
       try {
         const [league, standings, results, users] = await Promise.all([
-          fetchLeagueByLeagueId(leagueId),
-          fetchStandingsByLeagueId(leagueId),
-          fetchResultsByLeagueId(leagueId),
-          fetchUsersByLeagueId(leagueId),
+          fetchLeagueByLeagueId(leagueId, user.exp),
+          fetchStandingsByLeagueId(leagueId, user.exp),
+          fetchResultsByLeagueId(leagueId, user.exp),
+          fetchUsersByLeagueId(leagueId, user.exp),
         ]);
         setLeague(league[0]);
         setStandings(standings);
@@ -45,7 +47,10 @@ export const LeagueDataProvider = ({ leagueId, children }) => {
 
   const refreshStandings = async () => {
     try {
-      const updatedStandings = await fetchStandingsByLeagueId(leagueId);
+      const updatedStandings = await fetchStandingsByLeagueId(
+        leagueId,
+        user.exp
+      );
       setStandings(updatedStandings);
     } catch (error) {
       console.error("error refreshing standings:", error);
@@ -54,7 +59,7 @@ export const LeagueDataProvider = ({ leagueId, children }) => {
 
   const refreshResults = async () => {
     try {
-      const updatedResults = await fetchResultsByLeagueId(leagueId);
+      const updatedResults = await fetchResultsByLeagueId(leagueId, user.exp);
       setResults(updatedResults);
     } catch (error) {
       console.error("error refreshing results:", error);

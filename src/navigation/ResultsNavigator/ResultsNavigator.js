@@ -6,7 +6,7 @@ import ResultsScreen from "../../screens/ResultsScreen";
 
 const Stack = createNativeStackNavigator();
 
-const ResultsNavigator = () => {
+const ResultsNavigator = ({ navigation }) => {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -14,7 +14,7 @@ const ResultsNavigator = () => {
         component={ResultsScreen}
         options={{
           headerTitleAlign: "center",
-          headerTitle: () => <Header />,
+          headerTitle: (props) => <Header {...props} navigation={navigation} />,
           headerLeft: () => null,
         }}
       ></Stack.Screen>

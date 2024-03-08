@@ -1,12 +1,16 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import LogoutButton from "../LogoutButton/LogoutButton";
 
-const Header = () => {
+const Header = ({ navigation }) => {
   return (
     <View style={styles.header}>
-      <View>
+      <View style={styles.screen}>
         <Text style={styles.headerText}>Header</Text>
+      </View>
+      <View style={styles.logout}>
+        <LogoutButton navigation={navigation} />
       </View>
     </View>
   );
@@ -14,11 +18,17 @@ const Header = () => {
 
 const styles = StyleSheet.create({
   header: {
-    width: "100%",
-    height: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    width: "80%",
+    height: "100%",
+  },
+  screen: {
+    flex: 2,
+  },
+  logout: {
+    flex: 1,
   },
   headerText: {
     fontWeight: "bold",

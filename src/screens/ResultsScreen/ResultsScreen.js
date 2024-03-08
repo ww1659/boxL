@@ -13,7 +13,7 @@ const ResultsScreen = ({ navigation }) => {
   const [loadingResults, setLoadingResults] = useState(true);
 
   useEffect(() => {
-    fetchResultsByUserId(user.userId)
+    fetchResultsByUserId(user.userId, user.exp)
       .then((results) => {
         setMyResults(results);
         setLoadingResults(false);

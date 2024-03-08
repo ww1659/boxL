@@ -235,8 +235,8 @@ const PostResultScreen = ({ route, navigation }) => {
     };
 
     try {
-      const newResult = await postResult(result);
-      const updatedStandings = await patchStandings(result);
+      const newResult = await postResult(result, user.exp);
+      const updatedStandings = await patchStandings(result, user.exp);
       refreshStandings();
       refreshResults();
       setIsSubmitLoading(false);
