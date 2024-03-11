@@ -4,6 +4,8 @@ import { validateScore } from "../../utils/validateScore";
 import { validateChampsTiebreak } from "../../utils/validateChampsTiebreak";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { validateThirdSetScore } from "../../utils/validateThirdSetScore";
+import { checkTiebreak } from "../../utils/checkTiebreak";
+import { validateNormalTiebreak } from "../../utils/validiateNormalTiebreak";
 
 const ScoreInput = ({
   value,
@@ -15,9 +17,11 @@ const ScoreInput = ({
   maxChars,
   setLoss,
   otherSetLoss,
-  isTiebreak,
+  isChampionshipTiebreak,
   straightSetsError,
   setStraightSetsError,
+  isNormalTiebreak,
+  disabled,
 }) => {
   const [showIcon, setShowIcon] = useState(false);
 
@@ -33,15 +37,17 @@ const ScoreInput = ({
 
     setShowIcon(true);
     let isValid;
-    if (isTiebreak) {
+    if (isChampionshipTiebreak) {
       isValid = validateChampsTiebreak(score);
+    } else if (isNormalTiebreak) {
+      isValid = validateNormalTiebreak(score);
     } else if (thirdSet) {
       isValid = validateThirdSetScore(score);
     } else {
       isValid = validateScore(score);
     }
 
-    if (isValid && !thirdSet) {
+    if (isValid && !thirdSet && !isNormalTiebreak) {
       if (score.split("-")[1] > score.split("-")[0]) {
         setLoss(true);
       } else {
@@ -53,11 +59,12 @@ const ScoreInput = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isNormalTiebreak && styles.tiebreak]}>
       <View
         style={[
           styles.scoreInput,
           (straightSetsError || error) && styles.error,
+          disabled && styles.disabled,
         ]}
       >
         <TextInput
@@ -67,8 +74,10 @@ const ScoreInput = ({
           onEndEditing={validate}
           placeholder={placeholder}
           maxLength={maxChars}
+          editable={!disabled}
+          selectTextOnFocus={!disabled}
         />
-        {showIcon ? (
+        {showIcon && !isNormalTiebreak ? (
           <MaterialCommunityIcons
             style={styles.icon}
             name={error ? "alert-box-outline" : "hand-okay"}
@@ -85,6 +94,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  tiebreak: { flex: 0.6 },
   scoreInput: {
     flexDirection: "row",
     backgroundColor: "white",
@@ -95,8 +105,12 @@ const styles = StyleSheet.create({
     margin: 10,
     alignItems: "center",
   },
+
   error: {
     borderColor: "#D90429",
+  },
+  disabled: {
+    opacity: 0.5,
   },
   text: {
     color: "#2B2D42",
