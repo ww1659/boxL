@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
   },
+
   icon: {
     flex: 0.2,
     padding: 0,
