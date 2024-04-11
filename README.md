@@ -1,5 +1,7 @@
 # Mobile App Project
 
+Update: I haven't managed to get the app deployed on the web as the JWT verification is specific for mobile applications, so very few of the endpoints will actually provide meaningful data. It is therefore best to view / update this project with expo go (detailed below) on a mobile device. 
+
 This project is a React Native mobile application developed using Expo. It serves as an experimental project aimed at exploring mobile app development with React Native, comparing it to React web development, refreshing React skills, and implementing JWT verification for user authentication.
 
 ## Getting Started
